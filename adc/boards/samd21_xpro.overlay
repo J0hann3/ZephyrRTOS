@@ -1,0 +1,37 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Copyright (c) 2021 Argentum Systems Ltd.
+ */
+
+/ {
+	zephyr,user {
+		/* EXT-1, pin 3 ADC(+) */
+		io-channels = <&adc 8>;
+	};
+};
+
+&adc {	// reference to an already existing node adc
+	status = "okay";
+	#address-cells = <1>;	// use 1 cell to define the address of the child (reg), default value (2)
+	#size-cells = <0>;		//  use 0 cell to define the size of the child(reg), defualt value (1)
+	pinctrl-0 = <&adc_periph>;
+	pinctrl-names = "default";
+
+	channel@8 {
+		reg = <8>;		// address device in the parent bus
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_VDD_1_2";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,resolution = <12>;
+		zephyr,input-positive = <8>;
+	};
+};
+
+&pinctrl {
+	adc_periph: adc_periph {
+		group1 {
+			pinmux = <PB0B_ADC_AIN8>;
+		};
+	};
+};
