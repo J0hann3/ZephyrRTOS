@@ -1,0 +1,17 @@
+// &pinctrl {
+//     i2c0_default: i2c0_default {
+//         group1 {
+//             pinmux = <PA8D_SERCOM2_PAD0>, <PA9D_SERCOM2_PAD1>;
+//         };
+//     };
+// };
+
+&sercom2{
+    temperature_sensor: temperature_sensor@4f {
+        compatible = "i2c-device";
+        label = "Temperature Sensor";
+        reg = <0x4f>; // address slave device 0b1001111
+        // pinctrl-0 = <&i2c0_default>;
+        // pinctrl-names = "default";
+    };
+};
