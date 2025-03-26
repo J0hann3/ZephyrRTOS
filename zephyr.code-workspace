@@ -1,0 +1,180 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "..\\zephyrproject1"
+		}
+	],
+	"settings": {
+		// Hush CMake
+		"cmake.configureOnOpen": false,
+
+		// IntelliSense
+		"C_Cpp.default.compileCommands": "${workspaceFolder:ZephyrRTOS}/build/compile_commands.json",
+		"C_Cpp.default.includePath": [
+			"${userHome}/zephyrproject1/zephyr/include"
+		],
+		"C_Cpp.default.compilerPath": "${userHome}/zephyr-sdk-0.17.0/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc",
+		"C_Cpp.default.intelliSenseMode": "windows-gcc-arm",
+		"cortex-debug.armToolchainPath": "${userHome}/zephyr-sdk-0.17.0/arm-zephyr-eabi/bin/",
+    	"cortex-debug.armToolchainPrefix": "arm-zephyr-eabi",
+		"cortex-debug.openocdPath": "C:/ProgramData/chocolatey/bin/openocd",
+
+		"devicetree.defaultBoard": "samd21_xpro",
+		"devicetree.zephyr": "${userHome}/zephyrproject1/zephyr/",
+		"devicetree.modules": [
+			"${workspaceFolder:ZephyrRTOS}/build/modules/*",
+			"${userHome}/zephyrproject1/*",
+			"${userHome}/zephyrproject1/modules/*",
+			"."
+		],
+		
+		// File Associations
+		"files.associations": {}
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "West Build",
+				"type": "shell",
+				"group": {
+					"kind": "build",
+					"isDefault": true
+				},
+				"command": "${userHome}\\zephyrproject1\\.venv\\Scripts\\west",
+				"args": [
+					"build",
+					"-p",
+					"auto",
+					"-b",
+					"samd21_xpro",
+					"adc"
+				],
+				"options": {
+					"env": {
+						"ZEPHYR_BASE": "C:\\Users\\JohanneVIGNY\\zephyrproject1\\zephyr"
+					}
+				},
+				"problemMatcher": [
+					"$gcc"
+				],
+			},
+			{
+				"label": "West Configurable Build",
+				"type": "shell",
+				"group": {
+					"kind": "build",
+				},
+				"command": "${userHome}\\zephyrproject1\\.venv\\Scripts\\west",
+				"args": [
+					"build",
+					"-p",
+					"${input:pristine}",
+					"-b",
+					"${input:board}",
+					"${input:path}"
+				],
+				"options": {
+					"env": {
+						"ZEPHYR_BASE": "C:\\Users\\JohanneVIGNY\\zephyrproject1\\zephyr"
+					}
+				},
+				"problemMatcher": [
+					"$gcc"
+				]
+			},
+			{
+				"label": "West Flash",
+				"type": "shell",
+				"command": "${userHome}\\zephyrproject1\\.venv\\Scripts\\west",
+				"args": [
+					"flash"
+				],
+				"options": {
+					"env": {
+						"ZEPHYR_BASE": "C:\\Users\\JohanneVIGNY\\zephyrproject1\\zephyr"
+					}
+				},
+				"problemMatcher": [
+					"$gcc"
+				]
+			}
+		],
+		"inputs": [
+			{
+				"id": "board",
+				"type": "promptString",
+				"default": "samd21_xpro",
+				"description": "See https://docs.zephyrproject.org/latest/boards/index.html"
+			},
+			{
+				"id": "pristine",
+				"type": "pickString",
+				"description": "Choose when to run a pristine build",
+				"default": "auto",
+				"options": [
+					"auto",
+					"always",
+					"never"
+				]
+			},
+			{
+				"id": "path",
+				"type": "promptString",
+				"default": "adc",
+				"description": "Choose the directory to build"
+			}
+		]
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Launch",
+				"device": "ATSAMD21J18A",
+				"cwd": "${workspaceFolder:ZephyrRTOS}",
+				"executable": "build\\zephyr\\zephyr.elf",
+				"request": "launch",
+				"type": "cortex-debug",
+				"runToEntryPoint": "main",
+				"servertype": "openocd",
+				"gdbPath": "${userHome}\\zephyr-sdk-0.17.0\\arm-zephyr-eabi\\bin\\arm-zephyr-eabi-gdb",
+				"preLaunchTask": "West Build",
+				"configFiles": ["${userHome}/zephyrproject1/zephyr/boards/atmel/sam0/samd21_xpro/support/openocd.cfg"],
+				"svdPath": "Microchip::SAMD21_DFP@3.6.144",
+				"liveWatch": {
+					"enabled": true,
+					"samplesPerSecond": 4
+				}
+			},
+			{
+				"name": "Attach",
+				"device": "ATSAMD21J18A",
+				"cwd": "${workspaceFolder:ZephyrRTOS}",
+				"executable": "build\\zephyr\\zephyr.elf",
+				"request": "attach",
+				"type": "cortex-debug",
+				"runToEntryPoint": "main",
+				"servertype": "openocd",
+				"gdbPath": "${userHome}\\zephyr-sdk-0.17.0\\arm-zephyr-eabi\\bin\\arm-zephyr-eabi-gdb",
+				"configFiles": ["${userHome}/zephyrproject1/zephyr/boards/atmel/sam0/samd21_xpro/support/openocd.cfg"],
+				"svdPath": "Microchip::SAMD21_DFP@3.6.144",
+				"liveWatch": {
+					"enabled": true,
+					"samplesPerSecond": 4
+				}
+			},
+		]
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-vscode.cpptools-extension-pack",
+			"ms-vscode.vscode-embedded-tools",
+			"ms-vscode.vscode-serial-monitor",
+			"marus25.cortex-debug",
+		]
+	}
+}
