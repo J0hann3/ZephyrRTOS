@@ -1,0 +1,6 @@
+board:
+  name: nxg_court
+  full_name: NxG Court
+  vendor: atmel
+  socs:
+    - name: samd21g18a
