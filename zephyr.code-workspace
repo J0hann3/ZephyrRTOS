@@ -21,15 +21,6 @@
 		"cortex-debug.armToolchainPath": "${userHome}/zephyr-sdk-0.17.0/arm-zephyr-eabi/bin/",
     	"cortex-debug.armToolchainPrefix": "arm-zephyr-eabi",
 		"cortex-debug.openocdPath": "C:/ProgramData/chocolatey/bin/openocd",
-
-		"devicetree.defaultBoard": "samd21_xpro",
-		"devicetree.zephyr": "${userHome}/zephyrproject1/zephyr/",
-		"devicetree.modules": [
-			"${workspaceFolder:ZephyrRTOS}/build/modules/*",
-			"${userHome}/zephyrproject1/*",
-			"${userHome}/zephyrproject1/modules/*",
-			"."
-		],
 		
 		// File Associations
 		"files.associations": {}
@@ -134,7 +125,7 @@
 		"configurations": [
 			{
 				"name": "Launch",
-				"device": "ATSAMD21J18A",
+				"deviceName": "ATSAMD21J18A",
 				"cwd": "${workspaceFolder:ZephyrRTOS}",
 				"executable": "build\\zephyr\\zephyr.elf",
 				"request": "launch",
@@ -152,7 +143,7 @@
 			},
 			{
 				"name": "Attach",
-				"device": "ATSAMD21J18A",
+				"deviceName": "ATSAMD21J18A",
 				"cwd": "${workspaceFolder:ZephyrRTOS}",
 				"executable": "build\\zephyr\\zephyr.elf",
 				"request": "attach",
