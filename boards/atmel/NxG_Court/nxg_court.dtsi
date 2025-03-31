@@ -1,11 +1,12 @@
 #include <dt-bindings/pinctrl/samd21-da1gXabcd-pinctrl.h>
 
 &pinctrl {
-	// pwm_default: pwm_default {
-	// 	group1 {
-	// 		pinmux = <PB30E_TCC0_WO0>;
-	// 	};
-	// };
+	pwm_default: pwm_default {
+		group1 {
+			pinmux = <PA19F_TCC0_WO3>,
+				 <PA18F_TCC0_WO2>;
+		};
+	};
 
 	sercom2_i2c_default: sercom2_i2c_default {
 		group1 {

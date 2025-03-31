@@ -7,7 +7,7 @@
 
 / {
 	model = "NxG Court";
-	compatible = "nxg,court", "atmel,samd21g18a";
+	compatible = "nxg,court", "atmel,samd21g18a", "atmel,samd21";
 
 	chosen {
 		zephyr,console = &sercom3;
@@ -20,9 +20,10 @@
 		led0 = &led0;
 		led1 = &led1;
 		led2 = &led2;
-		// pwm-led0 = &pwm_led0;
+		pwm-led0 = &pwm_led0;
+		pwm-led2 = &pwm_led2;
 		sw0 = &push_button;
-		// i2c-0 = &sercom2;
+		i2c-0 = &sercom2;
 	};
 
 	leds: leds {
@@ -41,12 +42,15 @@
 		};
 	};
 
-	// pwmleds {
-	// 	compatible = "pwm-leds";
-	// 	pwm_led0: pwm_led_0 {
-	// 		pwms = <&tcc0 0 PWM_MSEC(20)>;
-	// 	};
-	// };
+	pwmleds: pwmleds {
+		compatible = "pwm-leds";
+		pwm_led0: pwm_led_0 {
+			pwms = <&tcc0 3 PWM_MSEC(20)>;
+		};
+		pwm_led2: pwm_led_2 {
+			pwms = <&tcc0 2 PWM_MSEC(20)>;
+		};
+	};
 
 	buttons {
 		compatible = "gpio-keys";
@@ -62,16 +66,16 @@
 	clock-frequency = <DT_FREQ_M(48)>;
 };
 
-// &tcc0 {
-// 	status = "okay";
-// 	compatible = "atmel,sam0-tcc-pwm";
-// 	/* Gives a maximum period of 1.4s */
-// 	prescaler = <4>;
-// 	#pwm-cells = <2>;
+&tcc0 {
+	status = "okay";
+	compatible = "atmel,sam0-tcc-pwm";
+	/* Gives a maximum period of 1.4s */
+	prescaler = <4>;
+	#pwm-cells = <2>;
 
-// 	pinctrl-0 = <&pwm_default>;
-// 	pinctrl-names = "default";
-// };
+	pinctrl-0 = <&pwm_default>;
+	pinctrl-names = "default";
+};
 
 &rtc {
 	status = "okay";
