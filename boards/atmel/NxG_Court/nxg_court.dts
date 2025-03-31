@@ -10,8 +10,8 @@
 	compatible = "nxg,court", "atmel,samd21g18a", "atmel,samd21";
 
 	chosen {
-		zephyr,console = &sercom3;
-		zephyr,shell-uart = &sercom3;
+		zephyr,console = &sercom0;
+		zephyr,shell-uart = &sercom0;
 		zephyr,sram = &sram0;
 		zephyr,flash = &flash0;
 	};
@@ -86,9 +86,9 @@
 &sercom0 {
 	status = "okay";
 	compatible = "atmel,sam0-uart";
-	current-speed = <9600>;
-	rxpo = <3>;
-	txpo = <1>;
+	current-speed = <115200>;
+	rxpo = <1>;
+	txpo = <0>;
 
 	pinctrl-0 = <&sercom0_uart_default>;
 	pinctrl-names = "default";

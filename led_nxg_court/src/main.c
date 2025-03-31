@@ -133,6 +133,7 @@ int main()
         {
             pwm_set_dt(&pwm_leds[i], period, pulse);
         }
+        printf("Pulse : %d\n", pulse);
         k_msleep(SLEEP_TIME_MS_LED / 7);
 
         if (inc)
