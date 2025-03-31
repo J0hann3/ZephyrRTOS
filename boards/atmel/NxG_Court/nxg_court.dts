@@ -45,7 +45,7 @@
 	pwmleds: pwmleds {
 		compatible = "pwm-leds";
 		pwm_led0: pwm_led_0 {
-			pwms = <&tcc0 3 PWM_MSEC(20)>;
+			pwms = <&tcc0 3 PWM_MSEC(20)>; // Need to invert polarity, but samd21 doesn't support it
 		};
 		pwm_led2: pwm_led_2 {
 			pwms = <&tcc0 2 PWM_MSEC(20)>;
