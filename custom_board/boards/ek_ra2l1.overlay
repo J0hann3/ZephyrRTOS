@@ -25,6 +25,16 @@
 		};
 	};
 	soc {
+		port_irq3: external-interrupt@40006003 {
+			compatible = "renesas,ra-external-interrupt";
+			reg = <0x40006003 0x1>;
+			channel = <3>;
+			renesas,sample-clock-div = <64>;
+			#port-irq-cells = <0>;
+			status = "okay";
+			interrupts = <11 0>;
+			interrupt-names = "sw1";
+		};
 		port_irq7: external-interrupt@40006007 {
 			compatible = "renesas,ra-external-interrupt";
 			reg = <0x40006007 0x1>;
@@ -40,8 +50,9 @@
 
 &ioport0 {
 	status = "okay";
-	port-irqs = <&port_irq7>;
-    port-irq-names = "port-irq7";
+	port-irqs = <&port_irq3>, <&port_irq7>;
+    port-irq-names = "port-irq3", "port_irq7";
+    port-irq3-pins = <4>;
     port-irq7-pins = <15>;
 };
 
