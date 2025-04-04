@@ -23,7 +23,11 @@
 		"cortex-debug.openocdPath": "C:/ProgramData/chocolatey/bin/openocd",
 		
 		// File Associations
-		"files.associations": {}
+		"files.associations": {
+			"stddef.h": "c",
+			"devicetree.h": "c",
+			"typeinfo": "c"
+		}
 	},
 	"tasks": {
 		"version": "2.0.0",
@@ -41,8 +45,8 @@
 					"-p",
 					"auto",
 					"-b",
-					"samd21_xpro",
-					"adc"
+					"ek_ra2l1",
+					"led_nxg_court"
 				],
 				"options": {
 					"env": {
@@ -98,7 +102,7 @@
 			{
 				"id": "board",
 				"type": "promptString",
-				"default": "samd21_xpro",
+				"default": "ek_ra2l1",
 				"description": "See https://docs.zephyrproject.org/latest/boards/index.html"
 			},
 			{
@@ -115,7 +119,7 @@
 			{
 				"id": "path",
 				"type": "promptString",
-				"default": "adc",
+				"default": "led_nxg_court",
 				"description": "Choose the directory to build"
 			}
 		]
@@ -125,38 +129,33 @@
 		"configurations": [
 			{
 				"name": "Launch",
-				"deviceName": "ATSAMD21J18A",
+				"deviceName": "R7FA2L1AB",
+				"device": "r7fa2l1ab",
+				// "deviceName": "ATSAMD21G18A",
 				"cwd": "${workspaceFolder:ZephyrRTOS}",
 				"executable": "build\\zephyr\\zephyr.elf",
 				"request": "launch",
 				"type": "cortex-debug",
 				"runToEntryPoint": "main",
-				"servertype": "openocd",
+				"servertype": "jlink",
 				"gdbPath": "${userHome}\\zephyr-sdk-0.17.0\\arm-zephyr-eabi\\bin\\arm-zephyr-eabi-gdb",
 				"preLaunchTask": "West Build",
-				"configFiles": ["${userHome}/zephyrproject1/zephyr/boards/atmel/sam0/samd21_xpro/support/openocd.cfg"],
-				"svdPath": "Microchip::SAMD21_DFP@3.6.144",
-				"liveWatch": {
-					"enabled": true,
-					"samplesPerSecond": 4
-				}
+				// "configFiles": ["${workspaceFolder:ZephyrRTOS}/boards/atmel/NxG_Court/support/openocd.cfg"],
+				"svdPath": "Renesas::RA_DFP@5.8.0",
+				// "svdPath": "Microchip::SAMD21_DFP@3.6.144",
 			},
 			{
 				"name": "Attach",
-				"deviceName": "ATSAMD21J18A",
+				"deviceName": "R7FA2L1AB",
+				"device": "r7fa2l1ab",
 				"cwd": "${workspaceFolder:ZephyrRTOS}",
 				"executable": "build\\zephyr\\zephyr.elf",
 				"request": "attach",
 				"type": "cortex-debug",
 				"runToEntryPoint": "main",
-				"servertype": "openocd",
+				"servertype": "jlink",
 				"gdbPath": "${userHome}\\zephyr-sdk-0.17.0\\arm-zephyr-eabi\\bin\\arm-zephyr-eabi-gdb",
-				"configFiles": ["${userHome}/zephyrproject1/zephyr/boards/atmel/sam0/samd21_xpro/support/openocd.cfg"],
-				"svdPath": "Microchip::SAMD21_DFP@3.6.144",
-				"liveWatch": {
-					"enabled": true,
-					"samplesPerSecond": 4
-				}
+				"svdPath": "Renesas::RA_DFP@5.8.0",
 			},
 		]
 	},
