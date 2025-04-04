@@ -1,0 +1,50 @@
+/ {
+	aliases {
+		sw0 = &sw1;
+		sw1 = &sw2;
+	};
+    leds {
+        led2: led2 {
+			gpios = < &ioport5 0x4 0x0 >;
+			label = "LED2";
+		};
+        led3: led3 {
+			gpios = < &ioport5 0x5 0x0 >;
+			label = "LED3";
+		};
+    };
+	buttons {
+		compatible = "gpio-keys";
+		sw1: sw1 {
+			gpios = <&ioport0 4 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			label = "SW1";		
+		};
+		sw2: sw2 {
+			gpios = <&ioport0 15 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			label = "SW2";
+		};
+	};
+	soc {
+		port_irq7: external-interrupt@40006007 {
+			compatible = "renesas,ra-external-interrupt";
+			reg = <0x40006007 0x1>;
+			channel = <7>;
+			renesas,sample-clock-div = <64>;
+			#port-irq-cells = <0>;
+			status = "okay";
+			interrupts = <7 0>;
+			interrupt-names = "sw2";
+		};
+	};
+};
+
+&ioport0 {
+	status = "okay";
+	port-irqs = <&port_irq7>;
+    port-irq-names = "port-irq7";
+    port-irq7-pins = <15>;
+};
+
+&ioport5 {
+	status = "okay";
+};
