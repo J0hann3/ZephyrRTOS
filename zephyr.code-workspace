@@ -46,7 +46,7 @@
 					"auto",
 					"-b",
 					"ek_ra2l1",
-					"led_nxg_court"
+					"custom_board"
 				],
 				"options": {
 					"env": {
@@ -119,7 +119,7 @@
 			{
 				"id": "path",
 				"type": "promptString",
-				"default": "led_nxg_court",
+				"default": "custom_board",
 				"description": "Choose the directory to build"
 			}
 		]
