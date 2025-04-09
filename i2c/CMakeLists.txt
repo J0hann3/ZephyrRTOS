@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20.0)
 
-set(BOARD samd21_xpro)  # Define board to use
+list(APPEND BOARD_ROOT C:\\Users\\JohanneVIGNY\\ZephyrRTOS)  # Define path to board
 
 find_package(Zephyr)    # pull zephyr and create a tagret named 'app'
 project(my-app)     # Must be call after the previous line to avoid conflict
