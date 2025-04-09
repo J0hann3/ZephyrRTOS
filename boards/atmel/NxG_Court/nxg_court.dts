@@ -23,7 +23,8 @@
 		pwm-led0 = &pwm_led0;
 		pwm-led2 = &pwm_led2;
 		sw0 = &push_button;
-		i2c-0 = &sercom2;
+		i2c-0 = &sercom1;
+		vcc-sensor = &vcc_sensor;
 	};
 
 	leds: leds {
@@ -39,6 +40,12 @@
 		led2: led_2 {
 			gpios = <&porta 18 GPIO_ACTIVE_HIGH>;
 			label = "Green LED";
+		};
+	};
+	vcc_sensor {
+		compatible = "gpio-leds";
+		vcc_sensor: vcc_sensor {
+			gpios = <&porta 25 GPIO_ACTIVE_LOW>;
 		};
 	};
 
@@ -96,17 +103,23 @@
 
 &sercom1 {
 	status = "okay";
-	compatible = "atmel,sam0-uart";
-	current-speed = <115200>;
-	rxpo = <3>;
-	txpo = <0>;
+	compatible = "atmel,sam0-i2c";
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+	#address-cells = <1>;
+	#size-cells = <0>;
 
-	pinctrl-0 = <&sercom1_uart_default>;
+	pinctrl-0 = <&sercom1_i2c_default>;
 	pinctrl-names = "default";
+
+	lum_sensor: lum_sensor@10 {
+		compatible = "i2c-device";
+		label = "Light sensor";
+		reg = <0x10>;
+	};
 };
 
 &sercom2 {
-	status = "okay";
+	status = "disabled";
 	compatible = "atmel,sam0-i2c";
 	clock-frequency = <I2C_BITRATE_FAST>;
 	#address-cells = <1>;
@@ -117,7 +130,7 @@
 };
 
 &sercom3 {
-	status = "okay";
+	status = "disabled";
 	compatible = "atmel,sam0-uart";
 	current-speed = <115200>;
 	rxpo = <1>;
@@ -128,7 +141,7 @@
 };
 
 &sercom5 {
-	status = "okay";
+	status = "disabled";
 	compatible = "atmel,sam0-spi";
 	dipo = <0>;
 	dopo = <2>;
