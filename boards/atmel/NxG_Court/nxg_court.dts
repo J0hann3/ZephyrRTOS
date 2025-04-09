@@ -116,6 +116,11 @@
 		label = "Light sensor";
 		reg = <0x10>;
 	};
+	temp_sensor: temp_sensor@44 {
+		compatible = "i2c-device";
+		label = "Temperature/Humidity sensor";
+		reg = <0x44>;
+	};
 };
 
 &sercom2 {
