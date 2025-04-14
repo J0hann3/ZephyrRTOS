@@ -24,7 +24,6 @@
 		pwm-led2 = &pwm_led2;
 		sw0 = &push_button;
 		i2c-0 = &sercom1;
-		vcc-sensor = &vcc_sensor;
 	};
 
 	leds: leds {
@@ -42,10 +41,13 @@
 			label = "Green LED";
 		};
 	};
-	vcc_sensor {
+	vcc {
 		compatible = "gpio-leds";
 		vcc_sensor: vcc_sensor {
 			gpios = <&porta 25 GPIO_ACTIVE_LOW>;
+		};
+		vcc_sd: vcc_sd {
+			gpios = <&portb 02 GPIO_ACTIVE_LOW>;
 		};
 	};
 
@@ -143,6 +145,32 @@
 
 	pinctrl-0 = <&sercom3_uart_default>;
 	pinctrl-names = "default";
+};
+
+&sercom4 {
+	status = "okay";
+	compatible = "atmel,sam0-spi";
+	dipo = <3>;
+	dopo = <0>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	pinctrl-0 = <&sercom4_spi_default>;
+	pinctrl-names = "default";
+	cs-gpios = <&portb 22 GPIO_ACTIVE_LOW>;
+
+	sd_card: sd_card@0 {
+		compatible = "zephyr,sdhc-spi-slot";
+		label = "SD Card Spi";
+		reg = <0>;
+		status = "okay";
+		mmc {
+			compatible = "zephyr,sdmmc-disk";
+			disk-name = "SD";
+			status = "okay";
+		};
+		spi-max-frequency = <5000000>;
+	};
 };
 
 &sercom5 {

@@ -20,6 +20,13 @@
 				 <PA17C_SERCOM1_PAD1>;
 		};
 	};
+	sercom4_spi_default: sercom4_spi_default {
+		group1 {
+			pinmux = <PA13D_SERCOM4_PAD1>,
+				 <PB11D_SERCOM4_PAD3>,
+				 <PA12D_SERCOM4_PAD0>;
+		};
+	};
 	sercom5_spi_default: sercom5_spi_default {
 		group1 {
 			pinmux = <PB2D_SERCOM5_PAD0>,
