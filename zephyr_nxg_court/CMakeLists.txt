@@ -6,4 +6,9 @@ find_package(Zephyr)    # pull zephyr and create a tagret named 'app'
 project(my-app)     # Must be call after the previous line to avoid conflict
                     # Define my CMake application project
 
-target_sources(app PRIVATE src/main.c)  # Add my-app to the app(zephyr) project
+target_sources(app PRIVATE src/main.c
+                            src/lum_sensor.c
+                            src/temp_hum_sensor.c
+                            src/sd_card.c)  # Add my-app to the app(zephyr) project
+
+target_include_directories(app PRIVATE include src)

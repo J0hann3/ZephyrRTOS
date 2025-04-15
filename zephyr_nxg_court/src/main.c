@@ -1,214 +1,41 @@
-#include <zephyr/drivers/i2c.h>
-#include <zephyr/drivers/gpio.h>
-#include <zephyr/drivers/spi.h>
-#include <zephyr/kernel.h>
+// #include <zephyr/drivers/i2c.h>
+// #include <zephyr/drivers/gpio.h>
+#include "lum_sensor.h"
+#include "temp_hum_sensor.h"
+#include "sd_card.h"
 
-#include <zephyr/storage/disk_access.h>
-#include <zephyr/fs/fs.h>
-#include <ff.h>
+static FATFS fat_fs;
 
-#define I2C_LUM_NODE DT_NODELABEL(lum_sensor)
-#define I2C_TEMP_NODE DT_NODELABEL(temp_sensor)
-
-#define VCC_SENSOR_NODE DT_NODELABEL(vcc_sensor)
-
-#if !DT_NODE_HAS_STATUS_OKAY(VCC_SENSOR_NODE)
-#error "Unsupported board: vcc sensor devicetree alias is not defined"
-#endif
-
-#if (!DT_NODE_HAS_STATUS_OKAY(I2C_LUM_NODE) || !DT_NODE_HAS_STATUS_OKAY(I2C_TEMP_NODE))
-#error "Unsupported board: sensor devicetree alias is not defined"
-#endif
-
-uint8_t read_temp_sensor(const struct i2c_dt_spec *temp_device, uint16_t *temp, uint16_t *humidity)
-{
-    uint8_t sensor_reg = 0xFD;
-    uint8_t reading[6]= {0};
-
-    // function i2c_write_read_dt doesn't generate a stop condition before switching to a read, no supported by all i2c sensor
-    if(i2c_write_dt(temp_device, &sensor_reg, 1) != 0){
-        printf("Failed to write/read I2C device address %x at Reg. %x \n\r", temp_device->addr, sensor_reg);
-        return 1;
-    }
-    k_msleep(10);
-    i2c_read_dt(temp_device, reading, 6);
-    (*temp) = reading[0] * 256 + reading[1];
-    (*temp) = -45 + 175 * (*temp) / 65535;
-
-    (*humidity) = reading[3] * 256 + reading[4];
-    (*humidity) = -6 + 125 * (*humidity) / 65535;
-    printf("Temperature: %d, Humidity %d\n", (*temp), (*humidity));
-    return 0;
-}
-
-
-int routine_read_temp(const struct i2c_dt_spec *temp_device)
-{
-    uint16_t temp;
-    uint16_t humidity;
-
-    while (1)
-    {
-        k_msleep(1000);
-        read_temp_sensor(temp_device, &temp, &humidity);
-    }
-    return 0;
-}
-
-int init_lum_sensor(const struct i2c_dt_spec *lum_device, const struct gpio_dt_spec *vcc_sensor)
-{
-    // Init Vcc sensor to then configure i2c device(light sensor)
-    if (gpio_pin_configure_dt(vcc_sensor, GPIO_OUTPUT_ACTIVE) < 0) 
-        return 1;
-
-    k_msleep(5);
-    
-    uint8_t config[3] = {0x00, 0x00, 0x00}; // { commmand config, config LSB, config MSB }, config => gain 1, IT => 100ms, Pers => 1
-
-    if (i2c_write_dt(lum_device, config, 3) != 0)
-        return 1;
-    return 0;
-}
-
-uint8_t read_lum_sensor(const struct i2c_dt_spec *lum_device, uint16_t *light)
-{
-    uint8_t sensor_reg = 0x04;
-    uint8_t lum_reading[2]= {0};
-
-    int ret = i2c_write_read_dt(lum_device, &sensor_reg, 1, &lum_reading[0], 2);
-    if(ret != 0){
-        printf("Failed to write/read I2C device address %x at Reg. %x \n\r", lum_device->addr, sensor_reg);
-        return 1;
-    }
-    *light = ((uint16_t)lum_reading[1] << 8) + lum_reading[0];
-    printf("Light sensor: %d\n", *light);
-    return 0;
-}
-
-uint8_t init_and_read_lum_sensor(const struct i2c_dt_spec *lum_device, const struct gpio_dt_spec *vcc_sensor, uint16_t *light)
-{
-	if (init_lum_sensor(lum_device, vcc_sensor) == 1){
-		printf("Init i2c error\n");
-		return 1;
-	}
-    k_msleep(150);
-	if (read_lum_sensor(lum_device, light))
-		return 1;
-	
-    gpio_pin_configure_dt(vcc_sensor, GPIO_INPUT | GPIO_PULL_UP);
-	return 0;
-}
-
-int routine_read_lum(const struct i2c_dt_spec *lum_device)
-{
-    uint16_t light;
-    while (1)
-    {
-        k_msleep(1000);
-        if (read_lum_sensor(lum_device, &light) == 1)
-            return 1;
-    }
-    return 0;
-}
-
-int lsdir(const char *path)
-{
-	struct fs_dir_t dirp;
-	static struct fs_dirent entry;
-
-	fs_dir_t_init(&dirp);
-
-	if (fs_opendir(&dirp, path)) {
-		printf("Error opening dir %s\n", path);
-		return 1;
-	}
-
-	printf("\nListing dir %s ...\n", path);
-	for (;;) {
-		if (fs_readdir(&dirp, &entry) || entry.name[0] == 0)
-			break;
-
-		if (entry.type == FS_DIR_ENTRY_DIR) {
-			printf("[DIR ] %s\n", entry.name);
-		} else {
-			printf("[FILE] %s (size = %zu)\n",
-				entry.name, entry.size);
-		}
-	}
-
-	/* Verify fs_closedir() */
-	fs_closedir(&dirp);
-	return 0;
-}
+static struct fs_mount_t mp = {
+    .type = FS_FATFS,
+    .fs_data = &fat_fs,
+    .mnt_point = "/SD:",
+};
 
 int main()
 {
-    const struct i2c_dt_spec lum_device = I2C_DT_SPEC_GET(I2C_LUM_NODE);
+    // const struct i2c_dt_spec lum_device = I2C_DT_SPEC_GET(I2C_LUM_NODE);
     const struct i2c_dt_spec temp_device = I2C_DT_SPEC_GET(I2C_TEMP_NODE);
-    const struct gpio_dt_spec vcc_sensor = GPIO_DT_SPEC_GET(DT_NODELABEL(vcc_sensor), gpios);
-    const struct gpio_dt_spec vcc_sd = GPIO_DT_SPEC_GET(DT_NODELABEL(vcc_sd), gpios);
-    FATFS fat_fs;
-    struct fs_mount_t mp = {
-        .type = FS_FATFS,
-        .fs_data = &fat_fs,
-        .mnt_point = "/SD:",
-    };
-    const char *disk_pdrv = "SD";
-    uint64_t memory_size_mb;
-    uint32_t block_count;
-    uint32_t block_size;
-    uint16_t light;
+    // const struct gpio_dt_spec vcc_sensor = GPIO_DT_SPEC_GET(DT_NODELABEL(vcc_sensor), gpios);
+    
+    // uint16_t light;
     uint16_t temp;
     uint16_t humidity;
 
-    // Init Vcc sd card to then configure spi device(sd card)
-    if (gpio_pin_configure_dt(&vcc_sd, GPIO_OUTPUT_ACTIVE) < 0) 
+    if (!device_is_ready(temp_device.bus)) 
         return 1;
-
-    k_msleep(50);
-    // if (!device_is_ready(temp_device.bus)) 
-    //     return 1;
     // if (!device_is_ready(lum_device.bus)) 
     //     return 1;
     // if (!gpio_is_ready_dt(&vcc_sensor))
     //     return 1;
-    
-    if (disk_access_ioctl(disk_pdrv, DISK_IOCTL_CTRL_INIT, NULL) != 0) {
-        printf("Error init device\n");
-        return 1;
-    }
-    if (disk_access_ioctl(disk_pdrv,DISK_IOCTL_GET_SECTOR_COUNT, &block_count) != 0) {
-        printf("Error get sector count\n");
-        return 1;
-    }
-    printf("Block count %u\n", block_count);
-    if (disk_access_ioctl(disk_pdrv, DISK_IOCTL_GET_SECTOR_SIZE, &block_size)) {
-        printf("Unable to get sector size\n");
-        return 1;
-    }
-    printf("Sector size %u bytes\n", block_size);
-
-    memory_size_mb = (uint64_t)block_count * block_size;
-	printf("Memory Size(MB) %u\n", (uint32_t)(memory_size_mb >> 20));
-
-    if (disk_access_ioctl(disk_pdrv, DISK_IOCTL_CTRL_DEINIT, NULL) != 0) {
-        printf("Storage deinit ERROR!\n");
-        return 1;
-    }
-    
-    if (fs_mount(&mp) != 0) {
-        printf("Error mounting disk\n");
-        return 1;
-    }
-
-    lsdir("/SD:");
+    test(&fat_fs, &mp);
     while (1)
     {
-    //     k_msleep(1000);
-    //     // if (init_and_read_lum_sensor(&lum_device, &vcc_sensor, &light) == 1)
-    //     //     return 1;
-    //     if (read_temp_sensor(&temp_device, &temp, &humidity) == 1)
-    //         return 1;
+        k_sleep(K_MSEC(1000));
+        // if (init_and_read_lum_sensor(&lum_device, &vcc_sensor, &light) == 1)
+            // return 1;
+        if (read_temp_sensor(&temp_device, &temp, &humidity) == 1)
+            return 1;
     }
     return 0;
 }
