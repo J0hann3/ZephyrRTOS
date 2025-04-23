@@ -12,7 +12,6 @@
 #include "configuration.h"
 #include "driver_init.h"
 #include "measures_logger.h"
-#include "tools.h"
 #include "definitions.h"
 
 // *****************************************************************************
@@ -202,7 +201,7 @@ void APP_Tasks(APP_ACCESS access)
     if (access == USUAL_ACCESS)
     {
       snprintf(currentfilename, 29, "%04u-%02u.csv",
-               current_datetime.date.year,
+               current_datetime.date.year + 1,
                current_datetime.date.month);
 
       appData.fileHandle = SYS_FS_FileOpen(currentfilename, (SYS_FS_FILE_OPEN_APPEND));

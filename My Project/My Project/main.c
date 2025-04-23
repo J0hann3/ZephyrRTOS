@@ -7,10 +7,10 @@
 
 int main(void)
 {
-	//struct io_descriptor *i2c_lum = {0};
+	struct io_descriptor *i2c_lum = {0};
 	struct io_descriptor *i2c_temp = {0};
 	measure_t current_measure = {.TEMP_HUM_SENSOR_EN = 1,
-								.LUM_SENSOR_EN = 0};
+								.LUM_SENSOR_EN = 1};
 	system_init();
 
 	sd_card_power_off();
@@ -29,9 +29,10 @@ int main(void)
 			current_measure.datetime.time.hour,
 			current_measure.datetime.time.min,
 			current_measure.datetime.time.sec);
-		//if (init_and_read_lum_sensor(i2c_lum, &current_measure.brightness) == 1 )
-			//return 1;
-		if (read_temp_sensor(i2c_temp, &current_measure.temperature,
+		if (current_measure.LUM_SENSOR_EN && init_and_read_lum_sensor(i2c_lum,
+					&current_measure.brightness) == 1 )
+			return 1;
+		if (current_measure.TEMP_HUM_SENSOR_EN && read_temp_sensor(i2c_temp, &current_measure.temperature,
 					&current_measure.humidity) == 1 )
 			return 1;
 		measures_logger_write(&current_measure);

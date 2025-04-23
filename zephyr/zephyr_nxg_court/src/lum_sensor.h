@@ -19,6 +19,5 @@ int init_lum_sensor(const struct i2c_dt_spec *lum_device, const struct gpio_dt_s
 uint8_t read_lum_sensor(const struct i2c_dt_spec *lum_device, uint16_t *light);
 uint8_t init_and_read_lum_sensor(const struct i2c_dt_spec *lum_device,
             const struct gpio_dt_spec *vcc_sensor, uint16_t *light);
-int routine_read_lum(const struct i2c_dt_spec *lum_device);
 
 #endif

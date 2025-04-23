@@ -41,6 +41,17 @@ uint8_t read_temp_sensor(struct io_descriptor *temp_device, uint16_t *temp, uint
 	return 0;
 }
 
+void ftoa(float fnum, char res[5])
+{
+  float tmpVal  = (fnum < 0) ? -fnum : fnum;
+
+  int   tmpInt1 = tmpVal;            // Get the integer
+  float tmpFrac = tmpVal - tmpInt1;  // Get fraction
+  int   tmpInt2 = (tmpFrac * 100);   // Turn into integer
+
+  snprintf(res, 5, "%02d.%01d", tmpInt1, tmpInt2);
+}
+
 /**
  * @brief convert temperature from u16 to string readable format : +AA.A
  */
@@ -64,10 +75,7 @@ void temp_to_string(const uint16_t u16_temp, char *s_temp)
 void hum_to_string(const uint16_t u16_hum, char s_hum[5])
 {
   float f_humidity;
-//   char  s_humidity[5];
 
   f_humidity = ((float)u16_hum) / 10;
   ftoa(f_humidity, s_hum);
-
-//   memcpy(s_hum, s_humidity, 5);
 }

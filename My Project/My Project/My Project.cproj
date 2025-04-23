@@ -968,12 +968,6 @@
     <Compile Include="temp_hum_sensor.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="tools.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="tools.h">
-      <SubType>compile</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Config\" />

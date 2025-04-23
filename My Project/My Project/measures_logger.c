@@ -1,27 +1,11 @@
-/*
- * c_measures_logger.c
- *
- * Created: 27/03/2023 15:30:32
- *  Author: Manuel
- */
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-#include <utils_assert.h>
 
 #include "measures_logger.h"
 #include "temp_hum_sensor.h"
 
 measures_stack_t m_stack;
-
-#ifdef UNIT_TESTS
-
-void measures_logger_reset()
-{
-  bzero(&m_stack, sizeof(m_stack));
-}
-
-#endif
 
 bool measures_logger_init(const uint16_t measuring_period)
 {
@@ -57,7 +41,6 @@ uint16_t measures_logger_get_size()
 
 MEASURES_LOGGER_ERROR measures_logger_get_error()
 {
-  ASSERT(m_stack.errorValue == MEASURES_LOGGER_ERROR_OK);
   return m_stack.errorValue;
 }
 
@@ -83,8 +66,6 @@ bool measures_logger_read(measure_t *last_measure)
     m_stack.errorValue = MEASURES_LOGGER_NOTHING_TO_READ;
     return MEASURES_LOGGER_RES_FAILURE;
   }
-  
-  ASSERT(m_stack.tail < MEASURES_LOGGER_MAX_SIZE);
 
   *last_measure = m_stack.measure[m_stack.tail];
 
@@ -124,8 +105,6 @@ bool measures_logger_write(const measure_t *new_measure)
     m_stack.errorValue = MEASURES_LOGGER_INVALID_PARAMETER;
     return MEASURES_LOGGER_RES_FAILURE;
   }
-  
-  ASSERT(m_stack.head < MEASURES_LOGGER_MAX_SIZE);
 
   if (m_stack.counter != 0 && ((m_stack.head) % m_stack.size) == m_stack.tail)
   {
@@ -178,7 +157,7 @@ bool measures_logger_read_CSV(char s_return[160])
   }
 
   // Brightness control
-  if (measureTo_Write.TEMP_HUM_SENSOR_EN)
+  if (measureTo_Write.LUM_SENSOR_EN)
     snprintf(s_brightness, 6, "%05u", measureTo_Write.brightness);
   else
     strncpy(s_brightness, s_desactivated, sizeof(s_desactivated));
@@ -191,19 +170,15 @@ bool measures_logger_read_CSV(char s_return[160])
            measureTo_Write.datetime.time.min,
            measureTo_Write.datetime.time.sec);
 
-  uint8_t size = strlen(s_temperature);
-  strncat(s_measure, s_temperature, size);
-  strncat(s_measure, ";", 1);
+  strncat(s_measure, s_temperature, strlen(s_temperature));
+  strcat(s_measure, ";");
 
-  size = strlen(s_humidity);
-  strncat(s_measure, s_humidity, size);
-  strncat(s_measure, ";", 1);
+  strncat(s_measure, s_humidity, strlen(s_humidity));
+  strcat(s_measure, ";");
 
-  size = strlen(s_brightness);
-  strncat(s_measure, s_brightness, size);
+  strncat(s_measure, s_brightness, strlen(s_brightness));
 
-  size = strlen(s_measure);
-  strncpy(s_return, s_measure, size);
+  strncpy(s_return, s_measure, strlen(s_measure));
 
   return MEASURES_LOGGER_RES_SUCCESS;
 }

@@ -1,10 +1,3 @@
-/*
- * c_measures_logger.h
- *
- * Created: 27/03/2023 16:52:56
- *  Author: Manuel
- */
-
 #ifndef MEASURES_LOGGER_H_
 #define MEASURES_LOGGER_H_
 
@@ -52,7 +45,6 @@ typedef struct
   uint8_t LUM_SENSOR_EN      : 1;
 } measure_t;
 
-#ifndef UNIT_TESTS
 typedef struct
 {
 	uint16_t              head;  // write index
@@ -62,19 +54,6 @@ typedef struct
 	MEASURES_LOGGER_ERROR errorValue;
 	measure_t             measure[MEASURES_LOGGER_MAX_SIZE];
 } measures_stack_t;
-#else
-typedef struct __attribute__((packed, aligned(1)))
-{
-	uint16_t              head;  // write index
-	uint16_t              tail;  // read index
-	uint16_t              size;
-	uint16_t              counter;
-	MEASURES_LOGGER_ERROR errorValue;
-	uint32_t			  canary_start;
-	measure_t			  measure[MEASURES_LOGGER_MAX_SIZE];
-	uint32_t			  canary_end;
-} measures_stack_t;
-#endif
 
 /**
  *  @brief Initialize stack size.

@@ -40,7 +40,6 @@ uint16_t measures_logger_get_size()
 
 MEASURES_LOGGER_ERROR measures_logger_get_error()
 {
-  // _ASSERT(m_stack.errorValue == MEASURES_LOGGER_ERROR_OK);
   return m_stack.errorValue;
 }
 
@@ -66,8 +65,6 @@ bool measures_logger_read(measure_t *last_measure)
     m_stack.errorValue = MEASURES_LOGGER_NOTHING_TO_READ;
     return MEASURES_LOGGER_RES_FAILURE;
   }
-  
-  // _ASSERT(m_stack.tail < MEASURES_LOGGER_MAX_SIZE);
 
   *last_measure = m_stack.measure[m_stack.tail];
 
@@ -107,8 +104,6 @@ bool measures_logger_write(const measure_t *new_measure)
     m_stack.errorValue = MEASURES_LOGGER_INVALID_PARAMETER;
     return MEASURES_LOGGER_RES_FAILURE;
   }
-  
-  // _ASSERT(m_stack.head < MEASURES_LOGGER_MAX_SIZE);
 
   if (m_stack.counter != 0 && ((m_stack.head) % m_stack.size) == m_stack.tail)
   {
@@ -161,7 +156,7 @@ bool measures_logger_read_CSV(char s_return[160])
   }
 
   // Brightness control
-  if (measureTo_Write.TEMP_HUM_SENSOR_EN)
+  if (measureTo_Write.LUM_SENSOR_EN)
     snprintf(s_brightness, 6, "%05u", measureTo_Write.brightness);
   else
     strncpy(s_brightness, s_desactivated, sizeof(s_desactivated));
