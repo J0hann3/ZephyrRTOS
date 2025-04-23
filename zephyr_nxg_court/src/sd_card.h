@@ -5,8 +5,10 @@
 #include <zephyr/storage/disk_access.h>
 #include <zephyr/fs/fs.h>
 #include <ff.h>
+#include "measures_logger.h"
 
 int lsdir(const char *path);
-int test(FATFS *fat_fs, struct fs_mount_t *mp);
+uint8_t get_disk_info();
+int write_in_sd_card(FATFS *fat_fs, struct fs_mount_t *mp);
 
 #endif

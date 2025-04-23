@@ -11,6 +11,8 @@
 
 uint8_t read_temp_sensor(const struct i2c_dt_spec *temp_device, uint16_t *temp, uint16_t *humidity);
 int routine_read_temp(const struct i2c_dt_spec *temp_device);
-
+void temp_to_string(const uint16_t u16_temp, char *s_temp);
+void hum_to_string(const uint16_t u16_hum, char s_hum[5]);
+void ftoa(float fnum, char res[5]);
 
 #endif
