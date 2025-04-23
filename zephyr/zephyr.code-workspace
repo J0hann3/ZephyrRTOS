@@ -4,7 +4,7 @@
 			"path": "."
 		},
 		{
-			"path": "..\\zephyrproject1"
+			"path": "..\\..\\zephyrproject1"
 		}
 	],
 	"settings": {
@@ -26,7 +26,19 @@
 		"files.associations": {
 			"stddef.h": "c",
 			"devicetree.h": "c",
-			"typeinfo": "c"
+			"typeinfo": "c",
+			"kernel.h": "c",
+			"log.h": "c",
+			"device.h": "c",
+			"cstdint": "c",
+			"spi.h": "c",
+			"gpio.h": "c",
+			"array": "c",
+			"string_view": "c",
+			"initializer_list": "c",
+			"bitset": "c",
+			"span": "c",
+			"regex": "c"
 		}
 	},
 	"tasks": {

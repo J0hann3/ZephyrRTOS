@@ -4,4 +4,4 @@
 set ZEPHYR_BASE=C:\Users\JohanneVIGNY\zephyrproject1\zephyr
 
 @REM activate python virtual environment
-..\zephyrproject1\.venv\Scripts\activate.bat
+..\..\zephyrproject1\.venv\Scripts\activate.bat
