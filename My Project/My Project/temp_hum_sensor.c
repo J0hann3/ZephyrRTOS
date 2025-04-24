@@ -20,7 +20,7 @@ uint8_t read_temp_sensor(struct io_descriptor *temp_device, uint16_t *temp, uint
 	check   = io_read(temp_device, reading, 6);
 	if (check != 6)
 	{
-		printf("Error invalid number of bytes read\n");
+		printf("Error invalid number of bytes read: %d\n", check);
 		return 1;
 	}
 	

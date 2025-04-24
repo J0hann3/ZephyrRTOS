@@ -197,13 +197,10 @@ void APP_Initialize(void);
     This routine must be called from SYS_Tasks() routine.
  */
 
-void APP_Tasks(APP_ACCESS access);
+void APP_Tasks(void);
 
 APP_STATES get_sd_app_state();
 void       set_sd_app_state(APP_STATES status);
-
-uint16_t get_sd_nb_writes(void);
-void     set_sd_nb_writes(uint16_t value);
 
 void sd_card_go_to_sleep();
 void sd_card_wake_from_sleep(void);

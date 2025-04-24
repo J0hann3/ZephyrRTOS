@@ -1,7 +1,6 @@
 #ifndef MEASURES_LOGGER_H_
 #define MEASURES_LOGGER_H_
 
-#include <hal_calendar.h>
 #include <stdbool.h>
 
 /**
@@ -35,7 +34,6 @@ typedef enum
 
 typedef struct
 {
-  struct calendar_date_time datetime;
   uint16_t                  temperature;
   uint16_t                  humidity;
   uint16_t                  brightness;

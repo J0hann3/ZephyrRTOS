@@ -70,12 +70,6 @@ bool measures_logger_read(measure_t *last_measure)
   *last_measure = m_stack.measure[m_stack.tail];
 
   /* Reset measure */
-  m_stack.measure[m_stack.tail].datetime.date.year  = 0;
-  m_stack.measure[m_stack.tail].datetime.date.month = 0;
-  m_stack.measure[m_stack.tail].datetime.date.day   = 0;
-  m_stack.measure[m_stack.tail].datetime.time.hour  = 0;
-  m_stack.measure[m_stack.tail].datetime.time.min   = 0;
-  m_stack.measure[m_stack.tail].datetime.time.sec   = 0;
   m_stack.measure[m_stack.tail].temperature         = 0;
   m_stack.measure[m_stack.tail].humidity            = 0;
   m_stack.measure[m_stack.tail].brightness          = 0;
@@ -161,14 +155,6 @@ bool measures_logger_read_CSV(char s_return[160])
     snprintf(s_brightness, 6, "%05u", measureTo_Write.brightness);
   else
     strncpy(s_brightness, s_desactivated, sizeof(s_desactivated));
-
-  snprintf(s_measure, 21, "%04u-%02u-%02uT%02u:%02u:%02u;",
-           measureTo_Write.datetime.date.year,
-           measureTo_Write.datetime.date.month,
-           measureTo_Write.datetime.date.day,
-           measureTo_Write.datetime.time.hour,
-           measureTo_Write.datetime.time.min,
-           measureTo_Write.datetime.time.sec);
 
   strncat(s_measure, s_temperature, strlen(s_temperature));
   strcat(s_measure, ";");
