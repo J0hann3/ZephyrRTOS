@@ -60,39 +60,67 @@ uint8_t get_disk_info()
     return 0;
 }
 
-int write_in_sd_card(FATFS *fat_fs, struct fs_mount_t *mp)
+bool is_card_detected()
+{
+    // const struct gpio_dt_spec cs = GPIO_DT_SPEC_GET(DT_NODELABEL(test), gpios);
+
+	// gpio_pin_configure_dt(&cs, GPIO_INPUT);
+	// k_msleep(100);
+	// bool is_sd_card = gpio_pin_get_raw(cs.port, cs.pin);
+	// printf("Card detected :%d\n", is_sd_card);
+
+	// gpio_pin_configure_dt(&cs, GPIO_OUTPUT);
+
+	// return is_sd_card;
+    return true;
+}
+
+static void close_unmount_file(struct fs_file_t *file, struct fs_mount_t *mp, const struct gpio_dt_spec *vcc_sd)
+{
+    fs_close(file);
+    fs_unmount(mp);
+    if (gpio_pin_configure_dt(vcc_sd, GPIO_OUTPUT_INACTIVE) < 0) 
+        return 1;
+} 
+
+int write_in_sd_card(FATFS *fat_fs, struct fs_mount_t *mp, const struct gpio_dt_spec *vcc_sd)
 {
     char currentfilename[32] = {'\0'};
     char csvline[168] = {'\0'};
     struct fs_file_t file;
     struct fs_dirent empty_file;
-    const struct gpio_dt_spec vcc_sd = GPIO_DT_SPEC_GET(DT_NODELABEL(vcc_sd), gpios);
 
     // Init Vcc sd card to then configure spi device(sd card)
-    if (gpio_pin_configure_dt(&vcc_sd, GPIO_OUTPUT_ACTIVE) < 0) 
+    if (gpio_pin_configure_dt(vcc_sd, GPIO_OUTPUT_ACTIVE) < 0) 
         return 1;
     k_msleep(50);
-    
+
+    // if (!is_card_detected())
+    // {
+    //     printf("Card not detected\n");
+    //     return 1;
+    // }
+
     if (fs_mount(mp) != 0) {
         printf("Error mounting disk\n");
         return 1;
     }
     
     fs_file_t_init(&file);
-    snprintf(currentfilename, 29, "/SD:/a.csv");
+    snprintf(currentfilename, 29, "/SD:/b.csv");
     if (fs_open(&file, currentfilename, FS_O_CREATE | FS_O_APPEND | FS_O_WRITE) != 0)
     {
         printf("Error failed to open filename: %s\n", currentfilename);
-        return 1;
+        return close_unmount_file(&file, mp, vcc_sd), 1;
     }
     if (fs_stat(currentfilename, &empty_file) != 0)
     {
         printf("Error stat file size\n");
-        return 1;
+        return close_unmount_file(&file, mp, vcc_sd), 1;
     }
     if (empty_file.size == 0)
     {
-        fs_write(&file, "Timestamp;T(degC);H(%%);Luminosity(lux);\r\n", strlen("Timestamp;T(degC);H(%%);Luminosity(lux);\r\n"));
+        fs_write(&file, "T(degC);H(%%);Luminosity(lux);\r\n", strlen("T(degC);H(%%);Luminosity(lux);\r\n"));
     }
     uint16_t ml_size = measures_logger_get_size();
     for (int i = 0; i < ml_size; i++)
@@ -105,24 +133,14 @@ int write_in_sd_card(FATFS *fat_fs, struct fs_mount_t *mp)
             if (ml_err == MEASURES_LOGGER_ERROR_OK)
             {}
             else if (ml_err == MEASURES_LOGGER_NOTHING_TO_READ)
-            {
-                fs_close(&file);
-                return 1;
-            }
+                return close_unmount_file(&file, mp, vcc_sd), 1;
             else
-            {
-                fs_close(&file);
-                return 1;
-            }
+                return close_unmount_file(&file, mp, vcc_sd), 1;
         }
         strcat(csvline, "\r\n");
     
         fs_write(&file, csvline, strlen(csvline));
     }
-    fs_close(&file);
-
-    fs_unmount(mp);
-    if (gpio_pin_configure_dt(&vcc_sd, GPIO_OUTPUT_INACTIVE) < 0) 
-        return 1;
+    close_unmount_file(&file, mp, vcc_sd);
     return 0;
 }
