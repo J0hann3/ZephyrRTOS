@@ -782,10 +782,10 @@
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="measures_logger.c">
+    <Compile Include="measures_logger\measures_logger.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="measures_logger.h">
+    <Compile Include="measures_logger\measures_logger.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="printf.c">
@@ -990,6 +990,7 @@
     <Folder Include="hpl\sercom\" />
     <Folder Include="hpl\sysctrl\" />
     <Folder Include="hri\" />
+    <Folder Include="measures_logger\" />
     <Folder Include="sd_card_driver\" />
     <Folder Include="sd_card_driver\driver\" />
     <Folder Include="sd_card_driver\driver\sdspi\" />
