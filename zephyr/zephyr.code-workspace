@@ -12,7 +12,7 @@
 		"cmake.configureOnOpen": false,
 
 		// IntelliSense
-		"C_Cpp.default.compileCommands": "${workspaceFolder:ZephyrRTOS}/build/compile_commands.json",
+		"C_Cpp.default.compileCommands": "${workspaceFolder:zephyr}/build/compile_commands.json",
 		"C_Cpp.default.includePath": [
 			"${userHome}/zephyrproject1/zephyr/include"
 		],
@@ -142,7 +142,7 @@
 			{
 				"name": "Launch Openocd Samd21",
 				"deviceName": "ATSAMD21G18A",
-				"cwd": "${workspaceFolder:ZephyrRTOS}",
+				"cwd": "${workspaceFolder:zephyr}",
 				"executable": "build\\zephyr\\zephyr.elf",
 				"request": "launch",
 				"type": "cortex-debug",
@@ -150,13 +150,13 @@
 				"servertype": "openocd",
 				"gdbPath": "${userHome}\\zephyr-sdk-0.17.0\\arm-zephyr-eabi\\bin\\arm-zephyr-eabi-gdb",
 				"preLaunchTask": "West Configurable Build",
-				"configFiles": ["${workspaceFolder:ZephyrRTOS}/boards/atmel/NxG_Court/support/openocd.cfg"],
+				"configFiles": ["${workspaceFolder:zephyr}/boards/atmel/NxG_Court/support/openocd.cfg"],
 				"svdPath": "Microchip::SAMD21_DFP@3.6.144",
 			},
 			{
 				"name": "Attach  Openocd Samd21",
 				"deviceName": "ATSAMD21G18A",
-				"cwd": "${workspaceFolder:ZephyrRTOS}",
+				"cwd": "${workspaceFolder:zephyr}",
 				"executable": "build\\zephyr\\zephyr.elf",
 				"request": "attach",
 				"type": "cortex-debug",
@@ -170,7 +170,7 @@
 				"name": "Launch Jlink ek_ra2l1",
 				"deviceName": "R7FA2L1AB",
 				"device": "r7fa2l1ab",
-				"cwd": "${workspaceFolder:ZephyrRTOS}",
+				"cwd": "${workspaceFolder:zephyr}",
 				"executable": "build\\zephyr\\zephyr.elf",
 				"request": "launch",
 				"type": "cortex-debug",
@@ -184,7 +184,7 @@
 				"name": "Attach  Jlink ek_ra2l1",
 				"deviceName": "R7FA2L1AB",
 				"device": "r7fa2l1ab",
-				"cwd": "${workspaceFolder:ZephyrRTOS}",
+				"cwd": "${workspaceFolder:zephyr}",
 				"executable": "build\\zephyr\\zephyr.elf",
 				"request": "attach",
 				"type": "cortex-debug",
