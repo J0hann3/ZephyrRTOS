@@ -3,7 +3,6 @@
 // Section: Included Files
 // *****************************************************************************
 // *****************************************************************************
-#include <hal_calendar.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -45,7 +44,6 @@
 */
 
 APP_DATA        appData;
-static uint16_t nb_writes = 0;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -70,11 +68,9 @@ bool SYS_Tasks(APP_ACCESS access)
   if (sd_card_is_card_detected() != true)
   {
 	  printf("Card not detected\n");
-    //diag_update_sd_card_status(PERIPHERAL_STATUS_NOT_CONNECTED);
   }
   else
   {
-    //diag_update_sd_card_status(PERIPHERAL_STATUS_OK);
 
     /* try to write until success (APP_IDLE) or error (APP_ERROR). */
     while (get_sd_app_state() < APP_IDLE)
@@ -86,11 +82,9 @@ bool SYS_Tasks(APP_ACCESS access)
       DRV_SDSPI_Tasks(sysObj.drvSDSPI0);
 
       /* Maintain the application's state machine. */
-      APP_Tasks(access);
+      APP_Tasks();
 
-      if (get_sd_app_state() == APP_ERROR)
-        ;//diag_update_sd_card_status(PERIPHERAL_STATUS_NOK);
-      else
+      if (get_sd_app_state() != APP_ERROR)
         error = false;
     }
   }
@@ -131,18 +125,11 @@ void APP_Initialize(void)
     See prototype in app.h.
  */
 
-void APP_Tasks(APP_ACCESS access)
+void APP_Tasks(void)
 {
-#ifdef DEBUG
-  volatile SYS_FS_ERROR fs_error = SYS_FS_ERROR_OK;
-#endif  // DEBUG
-  struct calendar_date_time current_datetime;
-  static char               currentfilename[32]      = {'\0'};
-  static char               testfilename[32]         = {'\0'};
+  static char               currentfilename[32]      = "data.csv";
   static uint16_t           mountUnmount_try_counter = 0;
-  char                      sdcarddata[160]          = {'\0'};
   char                      csvline[168]             = {'\0'};
-  static char               testline[160]            = {'\0'};
   SYS_FS_RESULT             res;
   SYS_FS_FORMAT_PARAM       opt = {0};
   uint8_t CACHE_ALIGN       work[512];
@@ -168,15 +155,7 @@ void APP_Tasks(APP_ACCESS access)
     }
     else
     {
-      /* Mount was successful. Set current drive so that we do not have to use absolute path. */
-      if (access == FORMAT_ACCESS)
-      {
-        appData.state = APP_FORMAT_DRIVE;
-      }
-      else
-      {
-        appData.state = APP_SET_CURRENT_DRIVE;
-      }
+      appData.state = APP_SET_CURRENT_DRIVE;
 
       mountUnmount_try_counter = 0;
     }
@@ -196,63 +175,37 @@ void APP_Tasks(APP_ACCESS access)
     break;
 
   case APP_OPEN_FIRST_FILE :
-    calendar_get_date_time(&CALENDAR_0, &current_datetime);
 
-    if (access == USUAL_ACCESS)
-    {
-      snprintf(currentfilename, 29, "%04u-%02u.csv",
-               current_datetime.date.year + 1,
-               current_datetime.date.month);
-
-      appData.fileHandle = SYS_FS_FileOpen(currentfilename, (SYS_FS_FILE_OPEN_APPEND));
-    }
-    else
-    {
-      snprintf(testfilename, 22, "test_file_%04u-%02u.txt", current_datetime.date.year, current_datetime.date.month);
-
-      appData.fileHandle = SYS_FS_FileOpen(testfilename, (SYS_FS_FILE_OPEN_WRITE));
-    }
+    appData.fileHandle = SYS_FS_FileOpen(currentfilename, (SYS_FS_FILE_OPEN_APPEND));
 
     /* Will open a file in write mode. It creates the file if it does not exist */
     if (appData.fileHandle == SYS_FS_HANDLE_INVALID)
     {
       /* Could not open the file. Error out*/
-#ifdef DEBUG
-      fs_error = SYS_FS_FileError(appData.fileHandle);
-#endif  // DEBUG
       appData.state = APP_ERROR;
     }
     else
     {
-      if (access == USUAL_ACCESS)
+      /* Is fileHandle a new file? */
+      if (!SYS_FS_FileSize(appData.fileHandle))
       {
-        /* Is fileHandle a new file? */
-        if (!SYS_FS_FileSize(appData.fileHandle))
-        {
-          appData.state = APP_WRITE_FIRST_LINE_TO_FILE;
-        }
-        else
-        {
-          appData.state = APP_WRITE_TO_FILE;
-        }
+        appData.state = APP_WRITE_FIRST_LINE_TO_FILE;
       }
       else
       {
-        appData.state = APP_WRITE_TEST_FILE;
+        appData.state = APP_WRITE_TO_FILE;
       }
     }
     break;
   case APP_WRITE_FIRST_LINE_TO_FILE :
-    snprintf(csvline, 128, "Timestamp;T(degC);H(%%);Luminosity(lux)\r\n");
+    // snprintf(csvline, 128, "T(degC);H(%%);Luminosity(lux)\r\n");
 
-    if (SYS_FS_FileStringPut(appData.fileHandle, csvline) == -1)
+    if (SYS_FS_FileStringPut(appData.fileHandle, "T(degC);H(%%);Luminosity(lux)\r\n") == -1)
     {
       /* Write was not successful. Close the file
        * and error out.*/
       SYS_FS_FileClose(appData.fileHandle);
-#ifdef DEBUG
-      fs_error = SYS_FS_FileError(appData.fileHandle);
-#endif  // DEBUG
+
       appData.state = APP_ERROR;
       break;
     }
@@ -266,9 +219,10 @@ void APP_Tasks(APP_ACCESS access)
     uint16_t ml_size = measures_logger_get_size();
     for (int i = 0; i < ml_size; i++)
     {
+      memset(csvline, 0, sizeof(csvline));
       /* Read measure from stack */
-      bool ml_read_err = measures_logger_read_CSV(sdcarddata);
-	    printf("'%s'\n", sdcarddata);
+      bool ml_read_err = measures_logger_read_CSV(csvline);
+	    printf("'%s'\n", csvline);
       if (ml_read_err == MEASURES_LOGGER_RES_FAILURE)
       {
         MEASURES_LOGGER_ERROR ml_err = measures_logger_get_error();
@@ -288,28 +242,17 @@ void APP_Tasks(APP_ACCESS access)
         }
       }
 
-      uint8_t size = strlen(sdcarddata);
-
-      for (uint8_t j = 0; j < sizeof(csvline); j++)
-        csvline[j] = '\0';
-
-      strncat(csvline, sdcarddata, size);
-      strncat(csvline, "\r\n", 2);
+      strcat(csvline, "\r\n");
 
       if (SYS_FS_FileStringPut(appData.fileHandle, csvline) == SYS_FS_RES_FAILURE)
       {
         /* Write was not successful. Close the file
          * and error out.*/
         SYS_FS_FileClose(appData.fileHandle);
-#ifdef DEBUG
-        fs_error = SYS_FS_FileError(appData.fileHandle);
-#endif  // DEBUG
         appData.state = APP_ERROR;
         break;
       }
     }
-    // all measure are writted to sd card
-    nb_writes++;
 
     if (appData.state != APP_ERROR)
     {
@@ -345,87 +288,6 @@ void APP_Tasks(APP_ACCESS access)
     }
     break;
 
-  case APP_WRITE_TEST_FILE :
-
-    snprintf(testline, 47, "%04u-%02u-%02u;%02u:%02u:%02u\r\n",
-             current_datetime.date.year,
-             current_datetime.date.month,
-             current_datetime.date.day,
-             current_datetime.time.hour,
-             current_datetime.time.min,
-             current_datetime.time.sec);
-
-    if (SYS_FS_FileStringPut(appData.fileHandle, testline) == SYS_FS_RES_FAILURE)
-    {
-      /* Write was not successful. Close the file
-       * and error out.*/
-      SYS_FS_FileClose(appData.fileHandle);
-#ifdef DEBUG
-      fs_error = SYS_FS_FileError(appData.fileHandle);
-#endif  // DEBUG
-      appData.state = APP_ERROR;
-      break;
-    }
-    // Successful write to SD card.
-    nb_writes++;
-
-    SYS_FS_FileClose(appData.fileHandle);
-    appData.state = APP_CHECK_TEST_FILE;
-    break;
-
-  case APP_CHECK_TEST_FILE :
-    /* Will open a file in read mode. */
-    appData.fileHandle = SYS_FS_FileOpen(testfilename, (SYS_FS_FILE_OPEN_READ));
-
-    if (appData.fileHandle == SYS_FS_HANDLE_INVALID)
-    {
-      /* Could not open the file. Error out*/
-#ifdef DEBUG
-      fs_error = SYS_FS_FileError(appData.fileHandle);
-#endif  // DEBUG
-      appData.state = APP_ERROR;
-    }
-    else
-    {
-      // Read a string from the file. csvline will be compared to the testline written earlier.
-      if (SYS_FS_FileStringGet(appData.fileHandle, csvline, sizeof(csvline)) == SYS_FS_RES_FAILURE)
-      {
-        /* Read was not successful. Close the file and error out.*/
-        SYS_FS_FileClose(appData.fileHandle);
-#ifdef DEBUG
-        fs_error = SYS_FS_FileError(appData.fileHandle);
-#endif  // DEBUG
-        appData.state = APP_ERROR;
-      }
-      else
-      {
-        if (strncmp(csvline, testline, sizeof(csvline)) != 0)
-        {
-          // The line read is different from the line written.
-          appData.state = APP_ERROR;
-        }
-      }
-
-      SYS_FS_FileClose(appData.fileHandle);
-      appData.state = APP_DELETE_TEST_FILE;
-    }
-    break;
-
-  case APP_DELETE_TEST_FILE :
-    /* deleting test file. */
-    if (SYS_FS_FileDirectoryRemove(testfilename) == SYS_FS_RES_FAILURE)
-    {
-#ifdef DEBUG
-      fs_error = SYS_FS_FileError(appData.fileHandle);
-#endif  // DEBUG
-      appData.state = APP_ERROR;
-    }
-    else
-    {
-      appData.state = APP_UNMOUNT_DISK;
-    }
-    break;
-
   case APP_FORMAT_DRIVE :
     opt.fmt     = SYS_FS_FORMAT_FAT;
     opt.au_size = 0;
@@ -449,9 +311,6 @@ void APP_Tasks(APP_ACCESS access)
 
   case APP_ERROR :
     /* The application comes here when the demo has failed. Close the opened file */
-#ifdef DEBUG
-    fs_error = SYS_FS_Error();
-#endif  // DEBUG
 
     // Try to close the file.
     SYS_FS_FileClose(appData.fileHandle);
@@ -470,9 +329,6 @@ void APP_Tasks(APP_ACCESS access)
 
 APP_STATES get_sd_app_state() { return appData.state; }
 void       set_sd_app_state(APP_STATES status) { appData.state = status; }
-
-uint16_t get_sd_nb_writes(void) { return nb_writes; }
-void     set_sd_nb_writes(uint16_t value) { nb_writes = value; }
 
 void sd_card_go_to_sleep()
 {
