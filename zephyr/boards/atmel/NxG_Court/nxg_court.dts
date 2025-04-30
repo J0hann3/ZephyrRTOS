@@ -50,6 +50,9 @@
 			gpios = <&portb 02 GPIO_ACTIVE_LOW>;
 		};
 	};
+	zephyr,user {
+		cs-gpios = <&portb 22 GPIO_ACTIVE_LOW>;
+	};
 
 	pwmleds: pwmleds {
 		compatible = "pwm-leds";
@@ -157,7 +160,7 @@
 
 	pinctrl-0 = <&sercom4_spi_default>;
 	pinctrl-names = "default";
-	cs-gpios = <&portb 22 GPIO_ACTIVE_LOW>;
+	// cs-gpios = <&portb 22 GPIO_ACTIVE_LOW>;
 
 	sd_card: sd_card@0 {
 		compatible = "zephyr,sdhc-spi-slot";
