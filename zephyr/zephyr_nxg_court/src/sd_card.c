@@ -1,5 +1,7 @@
 #include "sd_card.h"
 
+static const struct gpio_dt_spec cs = GPIO_DT_SPEC_GET(DT_PATH(zephyr_user), cs_gpios);
+
 int lsdir(const char *path)
 {
 	struct fs_dir_t dirp;
@@ -62,25 +64,23 @@ uint8_t get_disk_info()
 
 bool is_card_detected()
 {
-    // const struct gpio_dt_spec cs = GPIO_DT_SPEC_GET(DT_NODELABEL(test), gpios);
+	gpio_pin_configure_dt(&cs, GPIO_INPUT);
+	k_msleep(1);
+	bool is_sd_card = gpio_pin_get_raw(cs.port, cs.pin);
+	printf("Card detected :%d\n", is_sd_card);
 
-	// gpio_pin_configure_dt(&cs, GPIO_INPUT);
-	// k_msleep(100);
-	// bool is_sd_card = gpio_pin_get_raw(cs.port, cs.pin);
-	// printf("Card detected :%d\n", is_sd_card);
+	gpio_pin_configure_dt(&cs, GPIO_OUTPUT_ACTIVE);
 
-	// gpio_pin_configure_dt(&cs, GPIO_OUTPUT);
-
-	// return is_sd_card;
-    return true;
+	return is_sd_card;
 }
 
 static void close_unmount_file(struct fs_file_t *file, struct fs_mount_t *mp, const struct gpio_dt_spec *vcc_sd)
 {
     fs_close(file);
     fs_unmount(mp);
+    gpio_pin_configure_dt(&cs, GPIO_INPUT | GPIO_PULL_DOWN);
     if (gpio_pin_configure_dt(vcc_sd, GPIO_OUTPUT_INACTIVE) < 0) 
-        return 1;
+        return;
 } 
 
 int write_in_sd_card(FATFS *fat_fs, struct fs_mount_t *mp, const struct gpio_dt_spec *vcc_sd)
@@ -93,14 +93,13 @@ int write_in_sd_card(FATFS *fat_fs, struct fs_mount_t *mp, const struct gpio_dt_
     // Init Vcc sd card to then configure spi device(sd card)
     if (gpio_pin_configure_dt(vcc_sd, GPIO_OUTPUT_ACTIVE) < 0) 
         return 1;
-    k_msleep(50);
+    k_msleep(1);
 
-    // if (!is_card_detected())
-    // {
-    //     printf("Card not detected\n");
-    //     return 1;
-    // }
-
+    if (!is_card_detected())
+    {
+        printf("Card not detected\n");
+        return 1;
+    }
     if (fs_mount(mp) != 0) {
         printf("Error mounting disk\n");
         return 1;
@@ -120,7 +119,7 @@ int write_in_sd_card(FATFS *fat_fs, struct fs_mount_t *mp, const struct gpio_dt_
     }
     if (empty_file.size == 0)
     {
-        fs_write(&file, "T(degC);H(%%);Luminosity(lux);\r\n", strlen("T(degC);H(%%);Luminosity(lux);\r\n"));
+        fs_write(&file, "T(degC);H(%%);Luminosity(lux)\r\n", strlen("T(degC);H(%%);Luminosity(lux)\r\n"));
     }
     uint16_t ml_size = measures_logger_get_size();
     for (int i = 0; i < ml_size; i++)
