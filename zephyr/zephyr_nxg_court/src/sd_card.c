@@ -1,5 +1,5 @@
 #include "sd_card.h"
-
+// Uncomment all code comment to run on custom board nxg_court
 // static const struct gpio_dt_spec cs = GPIO_DT_SPEC_GET(DT_PATH(zephyr_user), cs_gpios);
 
 int lsdir(const char *path)
@@ -63,7 +63,7 @@ uint8_t get_disk_info()
 }
 
 bool is_card_detected()
-// {
+{
 // 	gpio_pin_configure_dt(&cs, GPIO_INPUT);
 // 	k_msleep(1);
 // 	bool is_sd_card = gpio_pin_get_raw(cs.port, cs.pin);
