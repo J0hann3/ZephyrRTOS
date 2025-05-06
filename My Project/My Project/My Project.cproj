@@ -234,6 +234,7 @@
       <Value>../sd_card_driver/system</Value>
       <Value>../sd_card_driver/system/fs/fat_fs/file_system</Value>
       <Value>../sd_card_driver/system/fs/fat_fs/hardware_access</Value>
+      <Value>../../../common/measures_logger</Value>
     </ListValues>
   </armgcc.compiler.directories.IncludePaths>
   <armgcc.compiler.optimization.level>Optimize for size (-Os)</armgcc.compiler.optimization.level>
@@ -354,6 +355,7 @@
       <Value>../sd_card_driver/system/ports</Value>
       <Value>../sd_card_driver/system/time</Value>
       <Value>../sd_card_driver/system/time/src</Value>
+      <Value>../../../common/measures_logger</Value>
     </ListValues>
   </armgcc.compiler.directories.IncludePaths>
   <armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
