@@ -18,7 +18,7 @@ int init_lum_sensor(struct io_descriptor *lum_device)
 	return 0;
 }
 
-uint8_t read_lum_sensor(struct io_descriptor *lum_device, uint16_t *light)
+uint8_t read_lum_sensor(uint16_t *light)
 {
 	uint8_t   data_read[2];
 	
@@ -48,7 +48,7 @@ uint8_t init_and_read_lum_sensor(struct io_descriptor *lum_device, uint16_t *lig
 		return 1;
 	}
 	delay_ms(150);
-	if (read_lum_sensor(lum_device, light))
+	if (read_lum_sensor(light))
 		return 1;
 	
 	gpio_set_pin_direction(VCC_SENSORS_EN, GPIO_DIRECTION_IN);
