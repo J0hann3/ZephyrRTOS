@@ -9,16 +9,13 @@
 			label = "LED3";
 		};
 	};
-	zephyr,user {
-		cd-gpios = < &ioport2 0x6 GPIO_ACTIVE_LOW >;
-	};
 	soc {
 		spi1: spi@40072100 {
 			compatible = "renesas,ra-spi";
 			#address-cells = < 0x1 >;
 			#size-cells = < 0x0 >;
 			channel = < 0x1 >;
-			interrupts = < 12 0x1 >, < 13 0x1 >, < 18 0x1 >, < 15 0x1 >;
+			interrupts = < 12 0x1 >, < 13 0x1 >, < 14 0x1 >, < 15 0x1 >;
 			interrupt-names = "rxi", "txi", "tei", "eri";
 			reg = < 0x40072100 0x100 >;
 			status = "okay";
