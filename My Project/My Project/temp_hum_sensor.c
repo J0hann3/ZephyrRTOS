@@ -13,14 +13,18 @@ uint8_t read_temp_sensor(struct io_descriptor *temp_device, uint16_t *temp, uint
 	uint8_t check = io_write(temp_device, &sensor_reg, 1);
 	if (check != 1)
 	{
+	#ifdef DEBUG
 		printf("Failed to write/read I2C device address\n");
+	#endif
 		return 1;
 	}
 	delay_ms(10);
 	check   = io_read(temp_device, reading, 6);
 	if (check != 6)
 	{
+	#ifdef DEBUG
 		printf("Error invalid number of bytes read: %d\n", check);
+	#endif
 		return 1;
 	}
 	
@@ -36,8 +40,9 @@ uint8_t read_temp_sensor(struct io_descriptor *temp_device, uint16_t *temp, uint
 	u32_humidity = ((uint32_t)((*humidity) * 1907) - 6000000) / 100000;
 	(*humidity) = (uint16_t)u32_humidity;
 	//(*humidity) = -6 + 125 * (*humidity) / 65535;
-	
+#ifdef DEBUG
 	printf("Temperature: %d, Humidity %d\n", ((*temp) - 1000) / 10, (*humidity)/ 10);
+#endif
 	return 0;
 }
 

@@ -26,19 +26,25 @@ uint8_t read_lum_sensor(struct io_descriptor *lum_device, uint16_t *light)
 
 	if (i2c_m_sync_cmd_read(&I2C_0, 0x04, data_read, 2) != 0)
 	{
+	#ifdef DEBUG
 		printf("Failed to write/read I2C device address \n");
+	#endif
 		return 1;
 	}
 	*light = ((uint16_t)data_read[1] << 8) + data_read[0];
 	*light = (uint32_t) (*light) * 82/100;
+#ifdef DEBUG
 	printf("Light sensor: %d\n", *light);
+#endif
 	return 0;
 }
 
 uint8_t init_and_read_lum_sensor(struct io_descriptor *lum_device, uint16_t *light)
 {
 	if (init_lum_sensor(lum_device) == 1){
+	#ifdef DEBUG
 		printf("Init i2c error\n");
+	#endif
 		return 1;
 	}
 	delay_ms(150);

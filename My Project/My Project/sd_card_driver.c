@@ -67,7 +67,9 @@ bool SYS_Tasks(APP_ACCESS access)
   /* Reading card detect input */
   if (sd_card_is_card_detected() != true)
   {
+	#ifdef DEBUG
 	  printf("Card not detected\n");
+  #endif
   }
   else
   {
@@ -222,7 +224,9 @@ void APP_Tasks(void)
       memset(csvline, 0, sizeof(csvline));
       /* Read measure from stack */
       bool ml_read_err = measures_logger_read_CSV(csvline);
+	  #ifdef DEBUG
 	    printf("'%s'\n", csvline);
+    #endif
       if (ml_read_err == MEASURES_LOGGER_RES_FAILURE)
       {
         MEASURES_LOGGER_ERROR ml_err = measures_logger_get_error();

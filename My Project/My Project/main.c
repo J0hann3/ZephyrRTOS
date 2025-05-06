@@ -32,6 +32,7 @@ int main(void)
 		{
 			SYS_Tasks(USUAL_ACCESS);
 		}
+		// _go_to_sleep();
 	}
 	return 0;
 }

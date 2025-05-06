@@ -3,7 +3,9 @@
 
 #include <hal_delay.h>
 #include <driver_init.h>
+#ifdef DEBUG
 #include "printf.h"
+#endif
 
 # define SLAVE_ADDR_LUM		0x10
 

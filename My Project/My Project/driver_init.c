@@ -217,7 +217,11 @@ void system_init(void)
 {
 	init_mcu();
 
+	// _set_sleep_mode(3); // set power management to standby (Stop: CPU clock, AHB clock, APB clock, main clock; regulator low power; ram low power)
+
+#ifdef DEBUG
 	USART_0_init();
+#endif
 
 	I2C_0_init();
 
