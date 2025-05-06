@@ -1,0 +1,3 @@
+&sercom0 {
+	status = "okay";
+};

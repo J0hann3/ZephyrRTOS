@@ -96,7 +96,7 @@
 };
 
 &sercom0 {
-	status = "okay";
+	status = "disabled";
 	compatible = "atmel,sam0-uart";
 	current-speed = <115200>;
 	rxpo = <1>;
