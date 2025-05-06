@@ -9,13 +9,17 @@ uint8_t read_temp_sensor(const struct i2c_dt_spec *temp_device, uint16_t *temp, 
 
     // function i2c_write_read_dt doesn't generate a stop condition before switching to a read, no supported by all i2c sensor
     if(i2c_write_dt(temp_device, &sensor_reg, 1) != 0){
+    #ifdef DEBUG
       printf("Failed to write/read I2C device address\n");
+    #endif
       return 1;
     }
     k_msleep(10);
     if (i2c_read_dt(temp_device, reading, 6) != 0)
     {
+    #ifdef DEBUG
       printf("Error invalid number of bytes read\n");
+    #endif
       return 1;
     }
 
@@ -32,7 +36,9 @@ uint8_t read_temp_sensor(const struct i2c_dt_spec *temp_device, uint16_t *temp, 
     (*humidity) = (uint16_t)u32_humidity;
     //(*humidity) = -6 + 125 * (*humidity) / 65535;
 
+  #ifdef DEBUG
     printf("Temperature: %d, Humidity %d\n", ((*temp) - 1000) / 10, (*humidity)/ 10);
+  #endif
     return 0;
 }
 

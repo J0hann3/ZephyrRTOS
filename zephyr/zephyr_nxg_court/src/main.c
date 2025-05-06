@@ -36,7 +36,9 @@ int main()
 
     if (!is_board_ready(&lum_device, &temp_device, &vcc_sensor, &vcc_sd))
     {
+    #ifdef DEBUG
         printf("Board is not ready\n");
+    #endif
         return 1;
     }
 

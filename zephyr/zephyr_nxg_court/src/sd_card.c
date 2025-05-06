@@ -1,6 +1,6 @@
 #include "sd_card.h"
 // Uncomment all code comment to run on custom board nxg_court
-// static const struct gpio_dt_spec cs = GPIO_DT_SPEC_GET(DT_PATH(zephyr_user), cs_gpios);
+static const struct gpio_dt_spec cs = GPIO_DT_SPEC_GET(DT_PATH(zephyr_user), cs_gpios); // comment for renesas ek_ra2l1
 
 int lsdir(const char *path)
 {
@@ -64,14 +64,18 @@ uint8_t get_disk_info()
 
 bool is_card_detected()
 {
-// 	gpio_pin_configure_dt(&cs, GPIO_INPUT);
-// 	k_msleep(1);
-// 	bool is_sd_card = gpio_pin_get_raw(cs.port, cs.pin);
-// 	printf("Card detected :%d\n", is_sd_card);
+    // comment for renesas ek_ra2l1
+	gpio_pin_configure_dt(&cs, GPIO_INPUT);
+	k_msleep(1);
+	bool is_sd_card = gpio_pin_get_raw(cs.port, cs.pin);
+#ifdef DEBUG
+	printf("Card detected :%d\n", is_sd_card);
+#endif
 
-// 	gpio_pin_configure_dt(&cs, GPIO_OUTPUT_ACTIVE);
+	gpio_pin_configure_dt(&cs, GPIO_OUTPUT_ACTIVE);
 
-// 	return is_sd_card;
+	return is_sd_card;
+    // end comment
     return true;
 }
 
@@ -79,7 +83,7 @@ static void close_unmount_file(struct fs_file_t *file, struct fs_mount_t *mp, co
 {
     fs_close(file);
     fs_unmount(mp);
-    // gpio_pin_configure_dt(&cs, GPIO_INPUT | GPIO_PULL_DOWN);
+    gpio_pin_configure_dt(&cs, GPIO_INPUT | GPIO_PULL_DOWN); // comment for renesas ek_ra2l1
     if (gpio_pin_configure_dt(vcc_sd, GPIO_OUTPUT_INACTIVE) < 0) 
         return;
 } 
@@ -98,11 +102,15 @@ int write_in_sd_card(FATFS *fat_fs, struct fs_mount_t *mp, const struct gpio_dt_
 
     if (!is_card_detected())
     {
+    #ifdef DEBUG
         printf("Card not detected\n");
+    #endif
         return 1;
     }
     if (fs_mount(mp) != 0) {
+    #ifdef DEBUG
         printf("Error mounting disk\n");
+    #endif
         return 1;
     }
     
@@ -110,12 +118,16 @@ int write_in_sd_card(FATFS *fat_fs, struct fs_mount_t *mp, const struct gpio_dt_
     snprintf(currentfilename, 29, "/SD:/b.csv");
     if (fs_open(&file, currentfilename, FS_O_CREATE | FS_O_APPEND | FS_O_WRITE) != 0)
     {
+    #ifdef DEBUG
         printf("Error failed to open filename: %s\n", currentfilename);
+    #endif
         return close_unmount_file(&file, mp, vcc_sd), 1;
     }
     if (fs_stat(currentfilename, &empty_file) != 0)
     {
+    #ifdef DEBUG
         printf("Error stat file size\n");
+    #endif
         return close_unmount_file(&file, mp, vcc_sd), 1;
     }
     if (empty_file.size == 0)
@@ -139,6 +151,9 @@ int write_in_sd_card(FATFS *fat_fs, struct fs_mount_t *mp, const struct gpio_dt_
         }
         strcat(csvline, "\r\n");
     
+    #ifdef DEBUG
+        printf("res : %s\n", csvline);
+    #endif
         fs_write(&file, csvline, strlen(csvline));
     }
     close_unmount_file(&file, mp, vcc_sd);
