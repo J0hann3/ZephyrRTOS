@@ -240,6 +240,7 @@
   <armgcc.compiler.optimization.level>Optimize for size (-Os)</armgcc.compiler.optimization.level>
   <armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
   <armgcc.compiler.warnings.AllWarnings>True</armgcc.compiler.warnings.AllWarnings>
+  <armgcc.compiler.warnings.ExtraWarnings>True</armgcc.compiler.warnings.ExtraWarnings>
   <armgcc.compiler.miscellaneous.OtherFlags>-std=gnu99 -fno-common</armgcc.compiler.miscellaneous.OtherFlags>
   <armgcc.linker.general.UseNewlibNano>True</armgcc.linker.general.UseNewlibNano>
   <armgcc.linker.libraries.Libraries>
@@ -425,6 +426,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="atmel_start_pins.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="calendar.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="calendar.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Config\hpl_dmac_config.h">

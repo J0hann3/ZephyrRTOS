@@ -17,7 +17,7 @@ int main(void)
 
 	while (1)
 	{
-		delay_ms(1000);
+		// delay_ms(1000);
 		
 		if (current_measure.LUM_SENSOR_EN && init_and_read_lum_sensor(i2c_lum,
 					&current_measure.brightness) == 1 )
@@ -32,7 +32,7 @@ int main(void)
 		{
 			SYS_Tasks(USUAL_ACCESS);
 		}
-		// _go_to_sleep();
+		_go_to_sleep();
 	}
 	return 0;
 }

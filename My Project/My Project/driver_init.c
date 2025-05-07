@@ -19,7 +19,7 @@ struct usart_sync_descriptor USART_0;
 
 struct i2c_m_sync_desc I2C_0;
 
-struct calendar_descriptor CALENDAR_0;
+// struct calendar_descriptor CALENDAR_0;
 
 void USART_0_PORT_init(void)
 {
@@ -185,39 +185,11 @@ void SpiDeInit()
 	gpio_set_pin_pull_mode(SPI_SCK, GPIO_PULL_DOWN);
 }
 
-void CALENDAR_0_CLOCK_init(void)
-{
-	_pm_enable_bus_clock(PM_BUS_APBA, RTC);
-	_gclk_enable_channel(RTC_GCLK_ID, CONF_GCLK_RTC_SRC);
-}
-
-void CALENDAR_0_init(void)
-{
-	CALENDAR_0_CLOCK_init();
-	calendar_init(&CALENDAR_0, RTC);
-	struct calendar_date new_date;
-	struct calendar_time new_time;
-	
-	new_date.year  = 2025;
-	new_date.month = 04;
-	new_date.day   = 16;
-
-	calendar_set_date(&CALENDAR_0, &new_date);
-
-	new_time.hour = 15;
-	new_time.min  = 41;
-	new_time.sec  = 1;
-
-	calendar_set_time(&CALENDAR_0, &new_time);
-	
-	calendar_enable(&CALENDAR_0);
-}
-
 void system_init(void)
 {
 	init_mcu();
 
-	// _set_sleep_mode(3); // set power management to standby (Stop: CPU clock, AHB clock, APB clock, main clock; regulator low power; ram low power)
+	_set_sleep_mode(3); // set power management to standby (Stop: CPU clock, AHB clock, APB clock, main clock; regulator low power; ram low power)
 
 #ifdef DEBUG
 	USART_0_init();
