@@ -24,16 +24,10 @@ extern "C" {
 #include <hal_usart_sync.h>
 
 #include <hal_i2c_m_sync.h>
-#include <hal_spi_m_sync.h>
-
-#include <hal_calendar.h>
 
 extern struct usart_sync_descriptor USART_0;
 
 extern struct i2c_m_sync_desc       I2C_0;
-extern struct spi_m_sync_descriptor SPI_0;
-
-extern struct calendar_descriptor CALENDAR_0;
 
 void USART_0_PORT_init(void);
 void USART_0_CLOCK_init(void);
@@ -42,14 +36,6 @@ void USART_0_init(void);
 void I2C_0_CLOCK_init(void);
 void I2C_0_init(void);
 void I2C_0_PORT_init(void);
-
-//void SPI_0_PORT_init(void);
-//void SPI_0_CLOCK_init(void);
-void SPI_0_init(void);
-void SpiDeInit();
-
-void CALENDAR_0_CLOCK_init(void);
-void CALENDAR_0_init(void);
 
 /**
  * \brief Perform system initialization, initialize pins and clocks for

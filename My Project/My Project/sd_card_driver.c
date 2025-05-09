@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "driver_init.h"
+#include "tools.h"
 #include "atmel_start_pins.h"
 #include "configuration.h"
 #include "driver_init.h"
@@ -341,14 +341,14 @@ void sd_card_go_to_sleep()
   // Set pin direction SD card ChipSelect
   sd_card_set_CS_pin_as_lowpower();
 
-  //HwTimerDisable();
+  HwTimerDisable();
 
   sd_card_power_off();
 }
 
 void sd_card_wake_from_sleep(void)
 {
-  SPI_0_init();
+  SpiInit();
 
   // Set pin direction SD card ChipSelect
   sd_card_set_CS_pin_as_output();
@@ -358,5 +358,5 @@ void sd_card_wake_from_sleep(void)
   // Wait for busy
   delay_ms(1);
 
-  //HwTimerInit();
+  HwTimerInit();
 }
