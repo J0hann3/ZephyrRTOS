@@ -156,6 +156,11 @@ void spi_go_to_sleep()
   delay_ms(1);
 
   SpiDeInit();
+
+  // Set pin direction LORA ChipSelect
+  gpio_set_pin_direction(SX126X_SS, GPIO_DIRECTION_IN);
+  gpio_set_pin_pull_mode(SX126X_SS, GPIO_PULL_UP);
+  
   SX126xIoDeInit();
   HwTimerDisable();
 }
