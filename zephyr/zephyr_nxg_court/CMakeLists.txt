@@ -6,7 +6,10 @@ set(BUILD_MODE "release" CACHE STRING "Build mode: debug or release")   # set bu
 
 if(BUILD_MODE STREQUAL "debug")
   set(CONF_FILE "prj.conf prj_debug.conf")                      # Enable console log via uart on kconfig
-  set(DTC_OVERLAY_FILE "boards/nxg_court_debug.overlay")        # Enable uart in devicetree
+
+  if(BOARD STREQUAL nxg_court)
+    set(DTC_OVERLAY_FILE "boards/nxg_court_debug.overlay")        # Enable uart in devicetree
+  endif()
 elseif(BUILD_MODE STREQUAL "release")
   set(CONF_FILE "prj.conf prj_release.conf")                    # Disable default console log via uart
 else()
