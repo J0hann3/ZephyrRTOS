@@ -72,14 +72,25 @@
 			zephyr,code = <INPUT_KEY_0>;
 		};
 	};
+
+	// power-states {
+	// 	standby: standby {
+	// 		compatible = "zephyr,power-state";
+	// 		power-state-name = "standby";
+	// 		min-residency-us = <1000000>;
+	// 		exit-latency-us = <20>;
+	// 		zephyr,pm-device-disabled;
+	// 	};
+	// };
 };
 
 &cpu0 {
-	clock-frequency = <DT_FREQ_M(48)>;
+	clock-frequency = <DT_FREQ_M(8)>;
+	// cpu-power-states = <&standby>;
 };
 
 &tcc0 {
-	status = "okay";
+	status = "disabled";
 	compatible = "atmel,sam0-tcc-pwm";
 	/* Gives a maximum period of 1.4s */
 	prescaler = <4>;
@@ -90,7 +101,7 @@
 };
 
 &rtc {
-	status = "okay";
+	status = "disabled";
 	counter-mode = "clock";
 	prescaler = <1024>;
 };
