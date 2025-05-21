@@ -171,19 +171,30 @@
 
 	pinctrl-0 = <&sercom4_spi_default>;
 	pinctrl-names = "default";
-	// cs-gpios = <&portb 22 GPIO_ACTIVE_LOW>;
+	cs-gpios = <&portb 10 GPIO_ACTIVE_LOW>;
 
-	sd_card: sd_card@0 {
+	lora0: sx1261@0 {
+		compatible = "semtech,sx1261";
+    	reg = <0>;
+		status = "okay";
+
+        spi-max-frequency = <1000000>; 
+        reset-gpios = <&portb 21 0>;
+        busy-gpios = <&portb 20 0>;
+        dio1-gpios = <&porta 15 0>;
+	};
+
+	sd_card: sd_card@1 {
 		compatible = "zephyr,sdhc-spi-slot";
 		label = "SD Card Spi";
-		reg = <0>;
+		reg = <1>;
 		status = "okay";
 		mmc {
 			compatible = "zephyr,sdmmc-disk";
 			disk-name = "SD";
 			status = "okay";
 		};
-		spi-max-frequency = <5000000>;
+		spi-max-frequency = <1000000>;
 	};
 };
 

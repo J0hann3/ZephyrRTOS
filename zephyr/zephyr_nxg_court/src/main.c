@@ -32,7 +32,7 @@ int main()
     const struct gpio_dt_spec vcc_sensor = GPIO_DT_SPEC_GET(DT_NODELABEL(vcc_sensor), gpios);
     const struct gpio_dt_spec vcc_sd = GPIO_DT_SPEC_GET(DT_NODELABEL(vcc_sd), gpios);
     
-    measure_t current_measure = {.TEMP_HUM_SENSOR_EN = 1, .LUM_SENSOR_EN = 0};
+    measure_t current_measure = {.TEMP_HUM_SENSOR_EN = 0, .LUM_SENSOR_EN = 0};
 
     if (!is_board_ready(&lum_device, &temp_device, &vcc_sensor, &vcc_sd))
     {
