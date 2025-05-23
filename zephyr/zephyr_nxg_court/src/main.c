@@ -11,6 +11,55 @@ static struct fs_mount_t mp = {
     .mnt_point = "/SD:",
 };
 
+void BoardInitPeriph(void)
+{
+    const struct device *porta = DEVICE_DT_GET(DT_ALIAS(port_a));
+    const struct device *portb = DEVICE_DT_GET(DT_ALIAS(port_b));
+
+	// Magnet detector
+    gpio_pin_configure(porta, 2, GPIO_OUTPUT_INACTIVE);
+
+	// Micro
+    gpio_pin_configure(porta, 10, GPIO_INPUT | GPIO_PULL_DOWN);
+    gpio_pin_configure(porta, 7, GPIO_INPUT | GPIO_PULL_DOWN);
+    gpio_pin_configure(porta, 6, GPIO_OUTPUT_ACTIVE);
+
+    gpio_pin_configure(portb, 8, GPIO_OUTPUT_INACTIVE);
+
+    gpio_pin_configure(portb, 3, GPIO_OUTPUT_ACTIVE);
+
+    gpio_pin_configure(porta, 22, GPIO_OUTPUT_INACTIVE);
+
+    gpio_pin_configure(porta, 28, GPIO_OUTPUT_INACTIVE);
+
+    gpio_pin_configure(porta, 25, GPIO_OUTPUT_ACTIVE);
+
+    gpio_pin_configure(porta, 11, GPIO_OUTPUT_INACTIVE);
+
+    // LED
+    gpio_pin_configure(porta, 24, GPIO_OUTPUT_ACTIVE);
+    gpio_pin_configure(porta, 27, GPIO_OUTPUT_ACTIVE);
+    gpio_pin_configure(porta, 18, GPIO_OUTPUT_INACTIVE);
+    gpio_pin_configure(porta, 14, GPIO_OUTPUT_ACTIVE);
+    gpio_pin_configure(porta, 19, GPIO_OUTPUT_ACTIVE);
+
+    gpio_pin_configure(portb, 9, GPIO_INPUT | GPIO_PULL_DOWN);
+    gpio_pin_configure(porta, 23, GPIO_INPUT | GPIO_PULL_DOWN);
+    gpio_pin_configure(porta, 5, GPIO_INPUT | GPIO_PULL_DOWN);
+    gpio_pin_configure(portb, 23, GPIO_INPUT | GPIO_PULL_DOWN);
+    gpio_pin_configure(porta, 3, GPIO_INPUT | GPIO_PULL_UP);
+
+    //sx126x
+    gpio_pin_configure(portb, 10, GPIO_INPUT | GPIO_PULL_UP);
+    gpio_pin_configure(porta, 20, GPIO_INPUT);
+    gpio_pin_configure(porta, 15, GPIO_INPUT);
+
+    //SPI
+    gpio_pin_configure(portb, 11, GPIO_INPUT | GPIO_PULL_DOWN);
+    gpio_pin_configure(porta, 12, GPIO_INPUT | GPIO_PULL_DOWN);
+    gpio_pin_configure(porta, 13, GPIO_INPUT | GPIO_PULL_DOWN);
+}
+
 bool is_board_ready(const struct i2c_dt_spec *lum_device, const struct i2c_dt_spec *temp_device,
                 const struct gpio_dt_spec *vcc_sensor, const struct gpio_dt_spec *vcc_sd)
 {
@@ -33,7 +82,8 @@ int main()
     const struct gpio_dt_spec vcc_sd = GPIO_DT_SPEC_GET(DT_NODELABEL(vcc_sd), gpios);
     
     measure_t current_measure = {.TEMP_HUM_SENSOR_EN = 0, .LUM_SENSOR_EN = 0};
-
+    
+    BoardInitPeriph();
     if (!is_board_ready(&lum_device, &temp_device, &vcc_sensor, &vcc_sd))
     {
     #ifdef DEBUG
