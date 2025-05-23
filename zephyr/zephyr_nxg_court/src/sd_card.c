@@ -105,12 +105,16 @@ int write_in_sd_card(FATFS *fat_fs, struct fs_mount_t *mp, const struct gpio_dt_
     #ifdef DEBUG
         printf("Card not detected\n");
     #endif
+        gpio_pin_configure_dt(&cs, GPIO_INPUT | GPIO_PULL_DOWN);
+        gpio_pin_configure_dt(vcc_sd, GPIO_OUTPUT_INACTIVE);
         return 1;
     }
     if (fs_mount(mp) != 0) {
     #ifdef DEBUG
         printf("Error mounting disk\n");
     #endif
+        gpio_pin_configure_dt(&cs, GPIO_INPUT | GPIO_PULL_DOWN);
+        gpio_pin_configure_dt(vcc_sd, GPIO_OUTPUT_INACTIVE);
         return 1;
     }
     
