@@ -25,12 +25,6 @@ void BoardInitPeriph(void)
 	gpio_set_pin_direction(VCC_3V3_ADC, GPIO_DIRECTION_IN);
 	gpio_set_pin_pull_mode(VCC_3V3_ADC, GPIO_PULL_DOWN);
 
-	// gpio_set_pin_direction(SX126X_BUSY, GPIO_DIRECTION_IN);
-	// gpio_set_pin_pull_mode(SX126X_BUSY, GPIO_PULL_OFF);
-  
-	// gpio_set_pin_direction(SX126X_DIO1, GPIO_DIRECTION_IN);
-	// gpio_set_pin_pull_mode(SX126X_DIO1, GPIO_PULL_OFF);
-
 	// outputs
 
 	gpio_set_pin_direction(RED_LED_CMD, GPIO_DIRECTION_OUT);
@@ -91,6 +85,7 @@ int main(void)
 								.LUM_SENSOR_EN = 0};
 	system_init();
 	BoardInitPeriph();
+	spi_go_to_sleep();
 
 	sd_card_power_off();
 	SYS_Initialize(NULL);
@@ -112,7 +107,6 @@ int main(void)
 		{
 			SYS_Tasks(USUAL_ACCESS);
 		}
-		spi_go_to_sleep();
 		_go_to_sleep();
 	}
 	return 0;
