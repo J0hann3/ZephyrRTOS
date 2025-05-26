@@ -341,8 +341,6 @@ void sd_card_go_to_sleep()
   // Set pin direction SD card ChipSelect
   sd_card_set_CS_pin_as_lowpower();
 
-  HwTimerDisable();
-
   sd_card_power_off();
 }
 
@@ -357,6 +355,4 @@ void sd_card_wake_from_sleep(void)
 
   // Wait for busy
   delay_ms(1);
-
-  HwTimerInit();
 }

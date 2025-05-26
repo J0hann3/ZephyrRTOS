@@ -95,44 +95,6 @@ void SX126xIoDeInit(void)
   gpio_set_pin_pull_mode(SX126X_DIO1, GPIO_PULL_OFF);
 }
 
-void HwTimerInit(void)
-{
-#if defined(USE_HWTMR_DEBUG)
-  GpioInit(&DbgHwTmrPin, HWTMR_DBG_PIN_0, PIN_OUTPUT, PIN_PUSH_PULL, PIN_NO_PULL, 0);
-#endif
-
-  // TC4
-  hri_pm_set_APBCMASK_TC4_bit(PM);
-  hri_gclk_write_CLKCTRL_reg(GCLK, (TC4_GCLK_ID << GCLK_CLKCTRL_ID_Pos) |  // GCLK_TC4
-                                       GCLK_CLKCTRL_GEN_GCLK3 |            // Generic clock generator 3
-                                       GCLK_CLKCTRL_CLKEN);                // enable GCLK
-
-  hri_tc_set_CTRLA_SWRST_bit(TC4);
-  hri_tc_wait_for_sync(TC4);
-  hri_tc_write_CTRLA_reg(TC4, TC_CTRLA_MODE_COUNT16 |                            // Choose 16 bits mode
-                                  TC_CTRLA_PRESCALER_DIV1 |                      // GCLK3 1
-                                  TC_CTRLA_WAVEGEN(TC_CTRLA_WAVEGEN_NFRQ_Val) |  // Compare with CC0
-                                  TC_CTRLA_RUNSTDBY);                            // GCLK will run in standby
-
-  hri_tccount16_write_CC_reg(TC4, 0, COMPARE_COUNT_MAX_VALUE);
-
-  hri_tc_set_INTEN_OVF_bit(TC4);
-  hri_tc_set_INTEN_MC0_bit(TC4);
-  NVIC_EnableIRQ(TC4_IRQn);
-  hri_tc_wait_for_sync(TC4);
-  hri_tc_set_CTRLA_ENABLE_bit(TC4);
-}
-
-void HwTimerDisable(void)
-{
-  // TC4
-  NVIC_ClearPendingIRQ(TC4_IRQn);
-  NVIC_DisableIRQ(TC4_IRQn);
-
-  // disable clock
-  hri_pm_clear_APBCMASK_TC4_bit(PM);
-}
-
 void spi_go_to_sleep()
 {
   SpiInit();
@@ -144,7 +106,6 @@ void spi_go_to_sleep()
   gpio_set_pin_level(SX126X_SS, false);
   // Wait for busy
   delay_ms(1);
-  HwTimerInit();
 
   SleepParams_t sleep_params;
 
@@ -162,5 +123,4 @@ void spi_go_to_sleep()
   gpio_set_pin_pull_mode(SX126X_SS, GPIO_PULL_UP);
   
   SX126xIoDeInit();
-  HwTimerDisable();
 }

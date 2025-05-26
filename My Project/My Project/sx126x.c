@@ -54,24 +54,6 @@ void SX126xWaitOnBusy(void)
 void SX126xSetOperatingMode(RadioOperatingModes_t mode)
 {
   OperatingMode = mode;
-#if defined(USE_RADIO_DEBUG)
-  switch (mode)
-  {
-  case MODE_TX :
-    SX126xDbgPinTxWrite(1);
-    SX126xDbgPinRxWrite(0);
-    break;
-  case MODE_RX :
-  case MODE_RX_DC :
-    SX126xDbgPinTxWrite(0);
-    SX126xDbgPinRxWrite(1);
-    break;
-  default :
-    SX126xDbgPinTxWrite(0);
-    SX126xDbgPinRxWrite(0);
-    break;
-  }
-#endif
 }
 
 void SX126xWakeup(void)
@@ -94,20 +76,14 @@ void SX126xWakeup(void)
   CRITICAL_SECTION_END();
 }
 
-void SX126xAntSwOn(void) {}
-
 void SX126xCheckDeviceReady(void)
 {
   if ((SX126xGetOperatingMode() == MODE_SLEEP) || (SX126xGetOperatingMode() == MODE_RX_DC))
   {
     SX126xWakeup();
-    // Switch is turned off when device is in sleep mode and turned on is all other modes
-    SX126xAntSwOn();
   }
   SX126xWaitOnBusy();
 }
-
-void SX126xAntSwOff(void) {}
 
 void SX126xWriteCommand(RadioCommands_t command, uint8_t *buffer,
   uint16_t size)
@@ -133,8 +109,6 @@ void SX126xWriteCommand(RadioCommands_t command, uint8_t *buffer,
 
 void SX126xSetSleep(SleepParams_t sleepConfig)
 {
-  SX126xAntSwOff();
-
   uint8_t value = (((uint8_t)sleepConfig.Fields.WarmStart << 2) |
                    ((uint8_t)sleepConfig.Fields.Reset << 1) |
                    ((uint8_t)sleepConfig.Fields.WakeUpRTC));
