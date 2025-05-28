@@ -30,6 +30,7 @@ target_sources(app PRIVATE src/main.c
                             src/lum_sensor.c
                             src/temp_hum_sensor.c
                             src/sd_card.c
+                            src/lora.c
                             ../../common/measures_logger/measures_logger.c) 
 
 target_include_directories(app PRIVATE src ../../common/measures_logger/)

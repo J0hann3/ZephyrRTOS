@@ -1,0 +1,53 @@
+#include <zephyr/drivers/lora.h>
+#include <zephyr/lorawan/lorawan.h>
+
+#define LORAWAN_DEV_EUI		{ 0x70, 0xB3, 0xD5, 0x40, 0xF6, 0x06,\
+                    0x38, 0x02 }
+#define LORAWAN_APP_EUI		{  0x70, 0xB3, 0xD5, 0x40, 0xFC, 0xAD,\
+                    0x56, 0xDF }
+#define LORAWAN_APP_KEY		{ 0xF2, 0x98, 0x99, 0xFA, 0x83, 0x64,\
+                    0xA8, 0x5F, 0xE0, 0x8E, 0xA6, 0x55, 0x3B, 0xF9, 0xE1, 0x45 }
+
+
+int lora_test_join()
+{
+    uint8_t dev_eui[] = LORAWAN_DEV_EUI;
+	uint8_t app_eui[] = LORAWAN_APP_EUI;
+	uint8_t app_key[] = LORAWAN_APP_KEY;
+    struct lorawan_join_config config_lora;
+    int ret;
+
+    config_lora.mode = LORAWAN_ACT_OTAA;
+    config_lora.dev_eui = dev_eui;
+    config_lora.otaa.join_eui = app_eui;
+    config_lora.otaa.app_key = app_key;
+    config_lora.otaa.nwk_key = app_key;
+    config_lora.otaa.dev_nonce = 0;
+
+    ret = lorawan_start();
+    if (ret < 0) {
+		printf("lorawan_start failed: %d", ret);
+		return 1;
+	}
+
+    ret = lorawan_join(&config_lora);
+    if (ret < 0) {
+		printf("lorawan_join_network failed: %d", ret);
+		return 1;
+	}
+    return 0;
+}
+
+void lora_cw()
+{
+    const struct device *lora = DEVICE_DT_GET(DT_NODELABEL(lora0));
+
+    printf("begin continuous wave\n");
+    int ret = lora_test_cw(lora, 868000000, 14, 2);     //Use EU868 norme for cw
+    if (ret != 0)
+    {
+        printf("failed continuous wave lora: %d\n", ret);
+        return;
+    }
+    printf("end continuous wave\n");
+}
