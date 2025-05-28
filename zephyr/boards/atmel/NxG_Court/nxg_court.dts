@@ -174,14 +174,16 @@
 	cs-gpios = <&portb 10 GPIO_ACTIVE_LOW>;
 
 	lora0: sx1261@0 {
-		compatible = "semtech,sx1261";
+		compatible = "semtech,sx1262";
     	reg = <0>;
 		status = "okay";
 
-        spi-max-frequency = <1000000>; 
-        reset-gpios = <&portb 21 0>;
-        busy-gpios = <&portb 20 0>;
-        dio1-gpios = <&porta 15 0>;
+        spi-max-frequency = <1000000>;
+		label = "SX126x";
+        reset-gpios = <&porta 21 GPIO_ACTIVE_LOW>;
+        busy-gpios = <&porta 20 GPIO_ACTIVE_HIGH>;
+        dio1-gpios = <&porta 15 GPIO_ACTIVE_HIGH>;
+		dio2-tx-enable;
 	};
 
 	sd_card: sd_card@1 {
