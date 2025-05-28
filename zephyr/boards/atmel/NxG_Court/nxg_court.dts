@@ -173,13 +173,13 @@
 	pinctrl-names = "default";
 	cs-gpios = <&portb 10 GPIO_ACTIVE_LOW>;
 
-	lora0: sx1261@0 {
+	lora0: sx1262@0 {
 		compatible = "semtech,sx1262";
     	reg = <0>;
 		status = "okay";
 
         spi-max-frequency = <1000000>;
-		label = "SX126x";
+		label = "SX1262";
         reset-gpios = <&porta 21 GPIO_ACTIVE_LOW>;
         busy-gpios = <&porta 20 GPIO_ACTIVE_HIGH>;
         dio1-gpios = <&porta 15 GPIO_ACTIVE_HIGH>;
