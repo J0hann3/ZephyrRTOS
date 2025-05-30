@@ -1,4 +1,6 @@
 #include "sd_card.h"
+#include "spi.h"
+
 // Uncomment all code comment to run on custom board nxg_court
 static const struct gpio_dt_spec cs = GPIO_DT_SPEC_GET(DT_PATH(zephyr_user), cs_gpios); // comment for renesas ek_ra2l1
 
@@ -83,6 +85,7 @@ static void close_unmount_file(struct fs_file_t *file, struct fs_mount_t *mp, co
 {
     fs_close(file);
     fs_unmount(mp);
+    spi_deinit();
     gpio_pin_configure_dt(&cs, GPIO_INPUT | GPIO_PULL_DOWN); // comment for renesas ek_ra2l1
     if (gpio_pin_configure_dt(vcc_sd, GPIO_OUTPUT_INACTIVE) < 0) 
         return;
@@ -109,12 +112,15 @@ int write_in_sd_card(FATFS *fat_fs, struct fs_mount_t *mp, const struct gpio_dt_
         gpio_pin_configure_dt(vcc_sd, GPIO_OUTPUT_INACTIVE);
         return 1;
     }
+    spi_init();
+
     if (fs_mount(mp) != 0) {
     #ifdef DEBUG
         printf("Error mounting disk\n");
     #endif
         gpio_pin_configure_dt(&cs, GPIO_INPUT | GPIO_PULL_DOWN);
         gpio_pin_configure_dt(vcc_sd, GPIO_OUTPUT_INACTIVE);
+        spi_deinit();
         return 1;
     }
     

@@ -1,5 +1,6 @@
 #include <zephyr/drivers/lora.h>
 #include <zephyr/lorawan/lorawan.h>
+#include "spi.h"
 
 #define LORAWAN_DEV_EUI		{ 0x70, 0xB3, 0xD5, 0x40, 0xF6, 0x06,\
                     0x38, 0x02 }
@@ -24,17 +25,21 @@ int lora_test_join()
     config_lora.otaa.nwk_key = app_key;
     config_lora.otaa.dev_nonce = 0;
 
+    spi_init();
     ret = lorawan_start();
     if (ret < 0) {
 		printf("lorawan_start failed: %d", ret);
+        spi_deinit();
 		return 1;
 	}
 
     ret = lorawan_join(&config_lora);
     if (ret < 0) {
 		printf("lorawan_join_network failed: %d", ret);
+        spi_deinit();
 		return 1;
 	}
+    spi_deinit();
     return 0;
 }
 
@@ -42,12 +47,15 @@ void lora_cw()
 {
     const struct device *lora = DEVICE_DT_GET(DT_NODELABEL(lora0));
 
+    spi_init();
     printf("begin continuous wave\n");
     int ret = lora_test_cw(lora, 868000000, 14, 2);     //Use EU868 norme for cw
     if (ret != 0)
     {
         printf("failed continuous wave lora: %d\n", ret);
+        spi_deinit();
         return;
     }
+    spi_deinit();
     printf("end continuous wave\n");
 }
