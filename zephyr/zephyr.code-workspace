@@ -11,6 +11,8 @@
 		// Hush CMake
 		"cmake.configureOnOpen": false,
 
+		"terminal.integrated.cwd": "${workspaceFolder:zephyr}",
+
 		// IntelliSense
 		"C_Cpp.default.compileCommands": "${workspaceFolder:zephyr}/build/compile_commands.json",
 		"C_Cpp.default.includePath": [
@@ -38,8 +40,23 @@
 			"initializer_list": "c",
 			"bitset": "c",
 			"span": "c",
-			"regex": "c"
-		}
+			"regex": "c",
+			"pinctrl_soc_sam_common.h": "c",
+			"i2c.h": "c",
+			"samd21g18a.h": "c",
+			"poweroff.h": "c",
+			"sx126x.h": "c",
+			"sx126x-board.h": "c",
+			"pinname-ioe.h": "c",
+			"radio.h": "c",
+			"sx12xx_common.h": "c",
+			"measures_logger.h": "c",
+			"lum_sensor.h": "c",
+			"rtc.h": "c",
+			"lorawan.h": "c",
+			"chrono": "c"
+		},
+		"cortex-debug.variableUseNaturalFormat": true
 	},
 	"tasks": {
 		"version": "2.0.0",
@@ -164,6 +181,33 @@
 				"servertype": "external",
 				"gdbPath": "${userHome}\\zephyr-sdk-0.17.0\\arm-zephyr-eabi\\bin\\arm-zephyr-eabi-gdb",
 				"gdbTarget": ":3333",
+				"svdPath": "Microchip::SAMD21_DFP@3.6.144",
+			},
+			{
+				"name": "Launch Jlink Samd21",
+				"deviceName": "ATSAMD21G18A",
+				"device": "ATSAMD21G18A",
+				"cwd": "${workspaceFolder:zephyr}",
+				"executable": "build\\zephyr\\zephyr.elf",
+				"request": "launch",
+				"type": "cortex-debug",
+				"runToEntryPoint": "main",
+				"servertype": "jlink",
+				"gdbPath": "${userHome}\\zephyr-sdk-0.17.0\\arm-zephyr-eabi\\bin\\arm-zephyr-eabi-gdb",
+				"preLaunchTask": "West Configurable Build",
+				"svdPath": "Microchip::SAMD21_DFP@3.6.144",
+			},
+			{
+				"name": "Attach  Jlink Samd21",
+				"deviceName": "ATSAMD21G18A",
+				"device": "ATSAMD21G18A",
+				"cwd": "${workspaceFolder:zephyr}",
+				"executable": "build\\zephyr\\zephyr.elf",
+				"request": "attach",
+				"type": "cortex-debug",
+				"runToEntryPoint": "main",
+				"servertype": "jlink",
+				"gdbPath": "${userHome}\\zephyr-sdk-0.17.0\\arm-zephyr-eabi\\bin\\arm-zephyr-eabi-gdb",
 				"svdPath": "Microchip::SAMD21_DFP@3.6.144",
 			},
 			{
