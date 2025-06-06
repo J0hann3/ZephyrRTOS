@@ -2,6 +2,9 @@
 #include "measures_logger.h"
 #include "temp_hum_sensor.h"
 #include "sd_card.h"
+#include "lora.h"
+#include "spi.h"
+#include <zephyr/sys/poweroff.h>
 
 static FATFS fat_fs;
 
@@ -34,6 +37,8 @@ void BoardInitPeriph(void)
 
     gpio_pin_configure(porta, 25, GPIO_OUTPUT_ACTIVE);
 
+    gpio_pin_configure(portb, 2, GPIO_OUTPUT_ACTIVE);
+
     gpio_pin_configure(porta, 11, GPIO_OUTPUT_INACTIVE);
 
     // LED
@@ -49,15 +54,9 @@ void BoardInitPeriph(void)
     gpio_pin_configure(portb, 23, GPIO_INPUT | GPIO_PULL_DOWN);
     gpio_pin_configure(porta, 3, GPIO_INPUT | GPIO_PULL_UP);
 
-    //sx126x
-    gpio_pin_configure(portb, 10, GPIO_INPUT | GPIO_PULL_UP);
-    gpio_pin_configure(porta, 20, GPIO_INPUT);
-    gpio_pin_configure(porta, 15, GPIO_INPUT);
+    gpio_pin_configure(portb, 22, GPIO_INPUT | GPIO_PULL_DOWN);
 
-    //SPI
-    gpio_pin_configure(portb, 11, GPIO_INPUT | GPIO_PULL_DOWN);
-    gpio_pin_configure(porta, 12, GPIO_INPUT | GPIO_PULL_DOWN);
-    gpio_pin_configure(porta, 13, GPIO_INPUT | GPIO_PULL_DOWN);
+    spi_deinit();
 }
 
 bool is_board_ready(const struct i2c_dt_spec *lum_device, const struct i2c_dt_spec *temp_device,
@@ -81,7 +80,7 @@ int main()
     const struct gpio_dt_spec vcc_sensor = GPIO_DT_SPEC_GET(DT_NODELABEL(vcc_sensor), gpios);
     const struct gpio_dt_spec vcc_sd = GPIO_DT_SPEC_GET(DT_NODELABEL(vcc_sd), gpios);
     
-    measure_t current_measure = {.TEMP_HUM_SENSOR_EN = 0, .LUM_SENSOR_EN = 0};
+    measure_t current_measure = {.TEMP_HUM_SENSOR_EN = 1, .LUM_SENSOR_EN = 0};
     
     BoardInitPeriph();
     if (!is_board_ready(&lum_device, &temp_device, &vcc_sensor, &vcc_sd))
@@ -92,7 +91,6 @@ int main()
         return 1;
     }
 
-    gpio_pin_configure_dt(&vcc_sd, GPIO_OUTPUT_INACTIVE);
 	measures_logger_init(1);
     
     while (1)
