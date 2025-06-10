@@ -81,6 +81,11 @@ void I2C_0_init(void)
 	I2C_0_PORT_init();
 }
 
+void delay_driver_init(void)
+{
+  delay_init(SysTick);
+}
+
 void system_init(void)
 {
 	init_mcu();
@@ -94,6 +99,8 @@ void system_init(void)
 	I2C_0_init();
 
 	SpiInit();
+
+	delay_driver_init();
 
 	CALENDAR_0_init();
 }

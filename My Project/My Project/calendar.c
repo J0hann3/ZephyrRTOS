@@ -74,6 +74,8 @@ void CALENDAR_0_init(void)
 
 static void CALENDAR_0_task_wdt_callback(struct calendar_descriptor *const descr)
 {
+    SEGGER_SYSVIEW_RecordEnterISR();
 	(void)descr;
+    SEGGER_SYSVIEW_RecordExitISR();
     return;
 }

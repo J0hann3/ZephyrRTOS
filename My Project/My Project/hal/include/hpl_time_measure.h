@@ -1,7 +1,7 @@
 /**
  * \file
  *
- * \brief HAL delay related functionality implementation.
+ * \brief Time measure related functionality declaration.
  *
  * Copyright (c) 2014-2018 Microchip Technology Inc. and its subsidiaries.
  *
@@ -31,52 +31,64 @@
  *
  */
 
-#include <hpl_irq.h>
-#include <hpl_reset.h>
-#include <hpl_sleep.h>
-#include "hal_delay.h"
-#include <hpl_delay.h>
+#ifndef _HPL_TIME_MEASURE_H_INCLUDED
+#define _HPL_TIME_MEASURE_H_INCLUDED
 
 /**
- * \brief Driver version
+ * \addtogroup HPL Time measure
+ *
+ * \section hpl_time_measure_rev Revision History
+ * - v1.0.0 Initial Release
+ *
+ *@{
  */
-#define DRIVER_VERSION 0x00000001u
+
+#include <compiler.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
- * \brief The pointer to a hardware instance used by the driver.
+ * \brief System time type
  */
-static void *hardware;
+typedef uint32_t system_time_t;
 
 /**
- * \brief Initialize Delay driver
+ * \name HPL functions
  */
-void delay_init(void *const hw)
-{
-	_delay_init(hardware = hw);
+//@{
+/**
+ * \brief Initialize system time module
+ *
+ * \param[in] hw The pointer to hardware instance to initialize
+ */
+void _system_time_init(void *const hw);
+
+/**
+ * \brief Deinitialize system time module
+ *
+ * \param[in] hw The pointer to hardware instance to initialize
+ */
+void _system_time_deinit(void *const hw);
+
+/**
+ * \brief Get system time
+ *
+ * \param[in] hw The pointer to hardware instance to initialize
+ */
+system_time_t _system_time_get(const void *const hw);
+
+/**
+ * \brief Get maximum possible system time
+ *
+ * \param[in] hw The pointer to hardware instance to initialize
+ */
+system_time_t _system_time_get_max_time_value(const void *const hw);
+//@}
+
+#ifdef __cplusplus
 }
-
-/**
- * \brief Perform delay in us
- */
-__attribute__((weak))
-void delay_us(const uint16_t us)
-{
-	_delay_cycles(hardware, _get_cycles_for_us(us));
-}
-
-/**
- * \brief Perform delay in ms
- */
-__attribute__((weak))
-void delay_ms(const uint16_t ms)
-{
-	_delay_cycles(hardware, _get_cycles_for_ms(ms));
-}
-
-/**
- * \brief Retrieve the current driver version
- */
-uint32_t delay_get_version(void)
-{
-	return DRIVER_VERSION;
-}
+#endif
+/**@}*/
+#endif /* _HPL_TIME_MEASURE_H_INCLUDED */

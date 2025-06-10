@@ -13,7 +13,7 @@
  * But the micro memory is not big enough to store that many measurements.
  * So it was decided to reduce the stack size by a factor of 2. And make a copy to SD card twice a day.
  */
-#define MEASURES_LOGGER_MAX_SIZE 12
+#define MEASURES_LOGGER_MAX_SIZE 1
 
 typedef enum
 {
