@@ -1,4 +1,5 @@
 #include "temp_hum_sensor.h"
+#include <SEGGER_SYSVIEW.h>
 
 uint8_t read_temp_sensor(struct io_descriptor *temp_device, uint16_t *temp, uint16_t *humidity)
 {
@@ -7,6 +8,7 @@ uint8_t read_temp_sensor(struct io_descriptor *temp_device, uint16_t *temp, uint
 	uint32_t u32_temp;
 	uint32_t u32_humidity;
 	
+	SEGGER_SYSVIEW_RecordVoid(e_measure_temp);
 	i2c_m_sync_get_io_descriptor(&I2C_0, &temp_device);
 	i2c_m_sync_enable(&I2C_0);
 	i2c_m_sync_set_slaveaddr(&I2C_0, SLAVE_ADDR_TEMP, I2C_M_SEVEN);
@@ -16,6 +18,7 @@ uint8_t read_temp_sensor(struct io_descriptor *temp_device, uint16_t *temp, uint
 	#ifdef DEBUG
 		printf("Failed to write/read I2C device address\n");
 	#endif
+		SEGGER_SYSVIEW_RecordEndCallU32(e_measure_temp, 1);
 		return 1;
 	}
 	delay_ms(10);
@@ -25,6 +28,7 @@ uint8_t read_temp_sensor(struct io_descriptor *temp_device, uint16_t *temp, uint
 	#ifdef DEBUG
 		printf("Error invalid number of bytes read: %d\n", check);
 	#endif
+		SEGGER_SYSVIEW_RecordEndCallU32(e_measure_temp, 1);
 		return 1;
 	}
 	
@@ -40,9 +44,12 @@ uint8_t read_temp_sensor(struct io_descriptor *temp_device, uint16_t *temp, uint
 	u32_humidity = ((uint32_t)((*humidity) * 1907) - 6000000) / 100000;
 	(*humidity) = (uint16_t)u32_humidity;
 	//(*humidity) = -6 + 125 * (*humidity) / 65535;
+
+	SEGGER_SYSVIEW_PrintfHost("Temperature: %d, Humidity %d\n", ((*temp) - 1000) / 10, (*humidity)/ 10);
 #ifdef DEBUG
 	printf("Temperature: %d, Humidity %d\n", ((*temp) - 1000) / 10, (*humidity)/ 10);
 #endif
+	SEGGER_SYSVIEW_RecordEndCallU32(e_measure_temp, 0);
 	return 0;
 }
 

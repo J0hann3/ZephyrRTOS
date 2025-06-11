@@ -7,26 +7,12 @@
   <armgcc.compiler.symbols.DefSymbols>
     <ListValues>
       <Value>NDEBUG</Value>
+      <Value>SEGGER_SYSTEM_VIEW</Value>
     </ListValues>
   </armgcc.compiler.symbols.DefSymbols>
   <armgcc.compiler.directories.IncludePaths>
     <ListValues>
       <Value>%24(PackRepoDir)\arm\CMSIS\5.4.0\CMSIS\Core\Include\</Value>
-      <Value>../Config</Value>
-      <Value>../</Value>
-      <Value>../examples</Value>
-      <Value>../hal/include</Value>
-      <Value>../hal/utils/include</Value>
-      <Value>../hpl/core</Value>
-      <Value>../hpl/dmac</Value>
-      <Value>../hpl/gclk</Value>
-      <Value>../hpl/pm</Value>
-      <Value>../hpl/port</Value>
-      <Value>../hpl/rtc</Value>
-      <Value>../hpl/sercom</Value>
-      <Value>../hpl/sysctrl</Value>
-      <Value>../hri</Value>
-      <Value>%24(PackRepoDir)\atmel\SAMD21_DFP\1.3.395\samd21a\include</Value>
       <Value>../sd_card_driver</Value>
       <Value>../sd_card_driver/driver</Value>
       <Value>../sd_card_driver/driver/sdspi</Value>
@@ -40,12 +26,32 @@
       <Value>../sd_card_driver/system</Value>
       <Value>../sd_card_driver/system/fs/fat_fs/file_system</Value>
       <Value>../sd_card_driver/system/fs/fat_fs/hardware_access</Value>
-      <Value>../../../common/measures_logger</Value>
-      <Value>C:\Users\JohanneVIGNY\ZephyrRTOS\common\RTT\RTT</Value>
+      <Value>../measures_logger</Value>
+      <Value>../RTT/RTT</Value>
+      <Value>../SystemView/SEGGER</Value>
+      <Value>../SystemView/SYSVIEW</Value>
+      <Value>../SystemView/Config</Value>
+      <Value>../Config</Value>
+      <Value>../</Value>
+      <Value>../examples</Value>
+      <Value>../hal/include</Value>
+      <Value>../hal/utils/include</Value>
+      <Value>../hpl/core</Value>
+      <Value>../hpl/dmac</Value>
+      <Value>../hpl/gclk</Value>
+      <Value>../hpl/pm</Value>
+      <Value>../hpl/port</Value>
+      <Value>../hpl/rtc</Value>
+      <Value>../hpl/sercom</Value>
+      <Value>../hpl/sysctrl</Value>
+      <Value>../hpl/systick</Value>
+      <Value>../hri</Value>
+      <Value>%24(PackRepoDir)\atmel\SAMD21_DFP\1.3.395\samd21a\include</Value>
     </ListValues>
   </armgcc.compiler.directories.IncludePaths>
   <armgcc.compiler.optimization.level>Optimize for size (-Os)</armgcc.compiler.optimization.level>
   <armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
+  <armgcc.compiler.optimization.PrepareDataForGarbageCollection>True</armgcc.compiler.optimization.PrepareDataForGarbageCollection>
   <armgcc.compiler.warnings.AllWarnings>True</armgcc.compiler.warnings.AllWarnings>
   <armgcc.compiler.warnings.ExtraWarnings>True</armgcc.compiler.warnings.ExtraWarnings>
   <armgcc.compiler.miscellaneous.OtherFlags>-std=gnu99 -fno-common</armgcc.compiler.miscellaneous.OtherFlags>
@@ -79,6 +85,7 @@
       <Value>../hpl/rtc</Value>
       <Value>../hpl/sercom</Value>
       <Value>../hpl/sysctrl</Value>
+      <Value>../hpl/systick</Value>
       <Value>../hri</Value>
       <Value>%24(PackRepoDir)\atmel\SAMD21_DFP\1.3.395\samd21a\include</Value>
     </ListValues>
@@ -99,6 +106,7 @@
       <Value>../hpl/rtc</Value>
       <Value>../hpl/sercom</Value>
       <Value>../hpl/sysctrl</Value>
+      <Value>../hpl/systick</Value>
       <Value>../hri</Value>
       <Value>%24(PackRepoDir)\atmel\SAMD21_DFP\1.3.395\samd21a\include</Value>
     </ListValues>

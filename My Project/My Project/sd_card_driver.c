@@ -12,6 +12,7 @@
 #include "driver_init.h"
 #include "measures_logger.h"
 #include "definitions.h"
+#include "SEGGER_SYSVIEW.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -70,9 +71,12 @@ bool SYS_Tasks(APP_ACCESS access)
 	#ifdef DEBUG
 	  printf("Card not detected\n");
   #endif
+    SEGGER_SYSVIEW_RecordU32(e_sd_card_detected, 0);
+    SEGGER_SYSVIEW_Warn("No card detected\n");
   }
   else
   {
+    SEGGER_SYSVIEW_RecordU32(e_sd_card_detected, 1);
 
     /* try to write until success (APP_IDLE) or error (APP_ERROR). */
     while (get_sd_app_state() < APP_IDLE)
@@ -143,6 +147,7 @@ void APP_Tasks(void)
     appData.state = APP_MOUNT_DISK;
     break;
   case APP_MOUNT_DISK :
+    SEGGER_SYSVIEW_RecordVoid(e_mount_sd_card);
     if (SYS_FS_Mount(SDCARD_DEV_NAME, SDCARD_MOUNT_NAME, FAT, 0, NULL) != 0)
     {
       /* The disk could not be mounted. Try
@@ -177,6 +182,7 @@ void APP_Tasks(void)
     break;
 
   case APP_OPEN_FIRST_FILE :
+    SEGGER_SYSVIEW_RecordVoid(e_open_sd_card);
 
     appData.fileHandle = SYS_FS_FileOpen(currentfilename, (SYS_FS_FILE_OPEN_APPEND));
 
@@ -201,7 +207,7 @@ void APP_Tasks(void)
     break;
   case APP_WRITE_FIRST_LINE_TO_FILE :
     // snprintf(csvline, 128, "T(degC);H(%%);Luminosity(lux)\r\n");
-
+    SEGGER_SYSVIEW_Print("T(degC);H(%);Luminosity(lux)\r\n");
     if (SYS_FS_FileStringPut(appData.fileHandle, "T(degC);H(%%);Luminosity(lux)\r\n") == -1)
     {
       /* Write was not successful. Close the file
@@ -216,6 +222,7 @@ void APP_Tasks(void)
 
   case APP_WRITE_TO_FILE : ;
     /* Product CSV line */
+    SEGGER_SYSVIEW_RecordVoid(e_write_sd_card);
 
     // Read FIFO and write to SD until measures_FIFO is empty
     uint16_t ml_size = measures_logger_get_size();
@@ -247,6 +254,7 @@ void APP_Tasks(void)
       }
 
       strcat(csvline, "\r\n");
+      SEGGER_SYSVIEW_Print(csvline);
 
       if (SYS_FS_FileStringPut(appData.fileHandle, csvline) == SYS_FS_RES_FAILURE)
       {
@@ -265,6 +273,8 @@ void APP_Tasks(void)
     }
     break;
   case APP_CLOSE_FILE :
+    SEGGER_SYSVIEW_RecordVoid(e_close_sd_card);
+
     SYS_FS_FileClose(appData.fileHandle);
 
     /* The test was successful. Lets idle. */
@@ -272,6 +282,8 @@ void APP_Tasks(void)
     break;
 
   case APP_UNMOUNT_DISK :
+    SEGGER_SYSVIEW_RecordVoid(e_unmount_sd_card);
+
     if (SYS_FS_Unmount(SDCARD_MOUNT_NAME) != 0)
     {
       /* The disk could not be un mounted. Try
@@ -336,6 +348,7 @@ void       set_sd_app_state(APP_STATES status) { appData.state = status; }
 
 void sd_card_go_to_sleep()
 {
+  SEGGER_SYSVIEW_RecordVoid(e_sleep_sd_card);
   SpiDeInit();
 
   // Set pin direction SD card ChipSelect
@@ -346,6 +359,7 @@ void sd_card_go_to_sleep()
 
 void sd_card_wake_from_sleep(void)
 {
+  SEGGER_SYSVIEW_RecordVoid(e_wake_up_sd_card);
   SpiInit();
 
   // Set pin direction SD card ChipSelect

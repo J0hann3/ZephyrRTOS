@@ -96,16 +96,15 @@ int main(void)
 	SYS_Initialize(NULL);
 	measures_logger_init(1);
 
-	SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_NO_BLOCK_SKIP);
+	// SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_NO_BLOCK_SKIP);
+	// SEGGER_RTT_WriteString(0, RTT_CTRL_TEXT_BRIGHT_YELLOW"Welcome here\n"RTT_CTRL_RESET);
+	// SEGGER_RTT_printf(0, "coucou1\n");
 	SEGGER_SYSVIEW_Conf();
 	SEGGER_SYSVIEW_OnTaskCreate(MAIN_TASK);
-	
-	SEGGER_RTT_WriteString(0, RTT_CTRL_TEXT_BRIGHT_YELLOW"Welcome here\n"RTT_CTRL_RESET);
+	SEGGER_SYSVIEW_OnTaskStartExec(MAIN_TASK);
 
 	while (1)
 	{
-		SEGGER_RTT_printf(0, "coucou1\n");
-		SEGGER_SYSVIEW_RecordVoid(34);
 		if (current_measure.LUM_SENSOR_EN && init_and_read_lum_sensor(i2c_lum,
 					&current_measure.brightness) == 1 )
 			return 1;
@@ -120,8 +119,8 @@ int main(void)
 			SYS_Tasks(USUAL_ACCESS);
 		}
 		SEGGER_SYSVIEW_OnIdle();
-		delay_ms(10000);
-		// _go_to_sleep();
+		// delay_ms(10000);
+		_go_to_sleep();
 		SEGGER_SYSVIEW_OnTaskStartExec(MAIN_TASK);
 	}
 	return 0;

@@ -127,11 +127,11 @@
           <AcmeProjectActionInfo Action="File" Source="hri/hri_usb_d21.h" IsConfig="false" Hash="RxhrdW3BEk3zWzOXVeshaQ" />
           <AcmeProjectActionInfo Action="File" Source="hri/hri_wdt_d21.h" IsConfig="false" Hash="ruUMkugqrufLH89qsLNR9Q" />
           <AcmeProjectActionInfo Action="File" Source="main.c" IsConfig="false" Hash="k0AH7j+BrmdFhBPzCCMptA" />
-          <AcmeProjectActionInfo Action="File" Source="driver_init.c" IsConfig="false" Hash="yGJtnkHz99FLf8+k/orEnQ" />
-          <AcmeProjectActionInfo Action="File" Source="driver_init.h" IsConfig="false" Hash="FUkecM2gJtobf+I6x+77cw" />
+          <AcmeProjectActionInfo Action="File" Source="driver_init.c" IsConfig="false" Hash="1MNqpLPHSoRIeRPkMOV4OQ" />
+          <AcmeProjectActionInfo Action="File" Source="driver_init.h" IsConfig="false" Hash="r7jDRPKdyX+d/EtaGv9SaA" />
           <AcmeProjectActionInfo Action="File" Source="atmel_start_pins.h" IsConfig="false" Hash="/MmkOkAlLnuEXtYY2ZAPmQ" />
-          <AcmeProjectActionInfo Action="File" Source="examples/driver_examples.h" IsConfig="false" Hash="IOeog65FhPlzkgVRX/5WGA" />
-          <AcmeProjectActionInfo Action="File" Source="examples/driver_examples.c" IsConfig="false" Hash="qEsOm6+5Y6GbgsmCbdln2Q" />
+          <AcmeProjectActionInfo Action="File" Source="examples/driver_examples.h" IsConfig="false" Hash="pjlEdlm6N8sCJQrkAR+DfQ" />
+          <AcmeProjectActionInfo Action="File" Source="examples/driver_examples.c" IsConfig="false" Hash="CiqW+zmtdPlXffqFPC+dCQ" />
           <AcmeProjectActionInfo Action="File" Source="hal/include/hal_usart_sync.h" IsConfig="false" Hash="ZzIGSRyjZuxRzFAtNNt7sw" />
           <AcmeProjectActionInfo Action="File" Source="hal/include/hpl_calendar.h" IsConfig="false" Hash="BydYrqFPbPNiZJO/Ir3uTQ" />
           <AcmeProjectActionInfo Action="File" Source="hal/include/hpl_missing_features.h" IsConfig="false" Hash="XsAvpgfutzkw0Y5SydYFaw" />
@@ -165,7 +165,7 @@
           <AcmeProjectActionInfo Action="File" Source="atmel_start.h" IsConfig="false" Hash="9RBG5E2ViQiSP2Gn4/FGpA" />
           <AcmeProjectActionInfo Action="File" Source="atmel_start.c" IsConfig="false" Hash="1RHIE7zTtYK4DURNPUqF9w" />
           <AcmeProjectActionInfo Action="File" Source="config/hpl_dmac_config.h" IsConfig="true" Hash="epQJaS6fYVwOO2L9+1CkQg" />
-          <AcmeProjectActionInfo Action="File" Source="config/hpl_gclk_config.h" IsConfig="true" Hash="Qd9uciLqt66PSgU5+rhGOA" />
+          <AcmeProjectActionInfo Action="File" Source="config/hpl_gclk_config.h" IsConfig="true" Hash="x1X4BM1D5PDSUvmoFNTqEA" />
           <AcmeProjectActionInfo Action="File" Source="config/hpl_pm_config.h" IsConfig="true" Hash="GH0DautnKY3X7yLEFG4tgA" />
           <AcmeProjectActionInfo Action="File" Source="config/hpl_rtc_config.h" IsConfig="true" Hash="/wTIYdpMcaq0q/y9HbmKUA" />
           <AcmeProjectActionInfo Action="File" Source="config/hpl_sercom_config.h" IsConfig="true" Hash="9FqR9Q6Q9c02RnFrazSWVw" />
@@ -216,6 +216,7 @@
   <armgcc.compiler.symbols.DefSymbols>
     <ListValues>
       <Value>NDEBUG</Value>
+      <Value>SEGGER_SYSTEM_VIEW</Value>
     </ListValues>
   </armgcc.compiler.symbols.DefSymbols>
   <armgcc.compiler.directories.IncludePaths>
@@ -235,7 +236,6 @@
       <Value>../sd_card_driver/system/fs/fat_fs/file_system</Value>
       <Value>../sd_card_driver/system/fs/fat_fs/hardware_access</Value>
       <Value>../measures_logger</Value>
-      <Value>C:\Users\JohanneVIGNY\ZephyrRTOS\common\RTT\RTT</Value>
       <Value>../RTT/RTT</Value>
       <Value>../SystemView/SEGGER</Value>
       <Value>../SystemView/SYSVIEW</Value>
@@ -260,6 +260,7 @@
   </armgcc.compiler.directories.IncludePaths>
   <armgcc.compiler.optimization.level>Optimize for size (-Os)</armgcc.compiler.optimization.level>
   <armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
+  <armgcc.compiler.optimization.PrepareDataForGarbageCollection>True</armgcc.compiler.optimization.PrepareDataForGarbageCollection>
   <armgcc.compiler.warnings.AllWarnings>True</armgcc.compiler.warnings.AllWarnings>
   <armgcc.compiler.warnings.ExtraWarnings>True</armgcc.compiler.warnings.ExtraWarnings>
   <armgcc.compiler.miscellaneous.OtherFlags>-std=gnu99 -fno-common</armgcc.compiler.miscellaneous.OtherFlags>
@@ -1148,12 +1149,6 @@
       <SubType>compile</SubType>
     </None>
     <None Include="RTT\README.md">
-      <SubType>compile</SubType>
-    </None>
-    <None Include="SystemView\.gitattributes">
-      <SubType>compile</SubType>
-    </None>
-    <None Include="SystemView\.gitmodules">
       <SubType>compile</SubType>
     </None>
     <None Include="SystemView\README.md">

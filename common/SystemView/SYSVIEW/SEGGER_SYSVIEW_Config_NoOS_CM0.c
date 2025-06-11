@@ -107,7 +107,7 @@ extern unsigned int SEGGER_SYSVIEW_TickCnt;
 *    Sends SystemView description strings.
 */
 static void _cbSendSystemDesc(void) {
-  SEGGER_SYSVIEW_SendSysDesc("N="SYSVIEW_APP_NAME",O=NoOS,D="SYSVIEW_DEVICE_NAME);
+  SEGGER_SYSVIEW_SendSysDesc("N="SYSVIEW_APP_NAME",O=NoOS_NxgCourt,D="SYSVIEW_DEVICE_NAME);
   SEGGER_SYSVIEW_SendSysDesc("I#15=SysTick");
 }
 
@@ -194,7 +194,7 @@ static inline uint32_t _dummy_get_cycles_for_us_internal(const uint16_t us, cons
 	}
 }
 
-static uint32_t _dummy_get_cycles_for_ms(const uint16_t ms)
+uint32_t _dummy_get_cycles_for_ms(const uint16_t ms)
 {
 	return _dummy_get_cycles_for_ms_internal(ms, CONF_CPU_FREQUENCY, CPU_FREQ_POWER);
 }
@@ -204,7 +204,7 @@ uint32_t _dummy_get_cycles_for_us(const uint16_t us)
 	return _dummy_get_cycles_for_us_internal(us, CONF_CPU_FREQUENCY, CPU_FREQ_POWER);
 }
 
-static void _dummy_delay_cycles(void *const hw, uint32_t cycles)
+void _dummy_delay_cycles(void *const hw, uint32_t cycles)
 {
 #ifndef _UNIT_TEST_
 	(void)hw;
@@ -231,16 +231,19 @@ static void _dummy_delay_cycles(void *const hw, uint32_t cycles)
 
 void delay_us(const uint16_t us)
 {
+	SEGGER_SYSVIEW_RecordU32(e_delay_us, us);
 	_dummy_delay_cycles(hardware, _dummy_get_cycles_for_us(us));
+	SEGGER_SYSVIEW_RecordEndCall(e_delay_us);
 }
 void delay_ms(const uint16_t ms)
 {
+	SEGGER_SYSVIEW_RecordU32(e_delay_ms, ms);
 	_dummy_delay_cycles(hardware, _dummy_get_cycles_for_ms(ms));
+	SEGGER_SYSVIEW_RecordEndCall(e_delay_ms);
 }
 
 void SysTick_Handler()
 {
-  printf("Systick Handler: %d\n", SEGGER_SYSVIEW_TickCnt);
   SEGGER_SYSVIEW_TickCnt++;
 }
 #endif
@@ -267,7 +270,6 @@ U32 SEGGER_SYSVIEW_X_GetTimestamp(void) {
     TickCount++;
   }
   Cycles += TickCount * CyclesPerTick;
-  printf("cycles: %u\n", Cycles);
   return Cycles;
 }
 

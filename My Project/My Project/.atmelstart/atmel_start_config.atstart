@@ -34,7 +34,7 @@ drivers:
       _$freq_output_Generic clock generator 1: 2000000
       _$freq_output_Generic clock generator 2: 500000
       _$freq_output_Generic clock generator 3: 1024
-      _$freq_output_Generic clock generator 4: 256
+      _$freq_output_Generic clock generator 4: 32768
       _$freq_output_Generic clock generator 5: 400000
       _$freq_output_Generic clock generator 6: 400000
       _$freq_output_Generic clock generator 7: 400000
@@ -46,7 +46,7 @@ drivers:
       enable_gclk_gen_2__externalclock: 1000000
       enable_gclk_gen_3: true
       enable_gclk_gen_3__externalclock: 1000000
-      enable_gclk_gen_4: true
+      enable_gclk_gen_4: false
       enable_gclk_gen_4__externalclock: 1000000
       enable_gclk_gen_5: false
       enable_gclk_gen_5__externalclock: 1000000
@@ -74,8 +74,8 @@ drivers:
       gclk_arch_gen_3_idc: false
       gclk_arch_gen_3_oe: false
       gclk_arch_gen_3_oov: false
-      gclk_arch_gen_4_RUNSTDBY: false
-      gclk_arch_gen_4_enable: true
+      gclk_arch_gen_4_RUNSTDBY: true
+      gclk_arch_gen_4_enable: false
       gclk_arch_gen_4_idc: false
       gclk_arch_gen_4_oe: false
       gclk_arch_gen_4_oov: false
@@ -106,7 +106,7 @@ drivers:
       gclk_gen_3_div: 32
       gclk_gen_3_div_sel: false
       gclk_gen_3_oscillator: 32kHz External Crystal Oscillator (XOSC32K)
-      gclk_gen_4_div: 128
+      gclk_gen_4_div: 1
       gclk_gen_4_div_sel: false
       gclk_gen_4_oscillator: 32kHz External Crystal Oscillator (XOSC32K)
       gclk_gen_5_div: 1
