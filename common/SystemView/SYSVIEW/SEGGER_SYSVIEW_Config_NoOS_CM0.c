@@ -56,7 +56,7 @@ Revision: $Rev: 18540 $
 
 #include <peripheral_clk_config.h>
 #include <hpl_time_measure.h>
-#include <stdio.h>
+#include "driver_init.h"
 
 extern unsigned int SEGGER_SYSVIEW_TickCnt;
 
@@ -66,10 +66,6 @@ extern unsigned int SEGGER_SYSVIEW_TickCnt;
 *
 **********************************************************************
 */
-#define SCB_ICSR  (*(volatile U32*) (0xE000ED04uL)) // Interrupt Control State Register
-#define SCB_ICSR_PENDSTSET_MASK     (1UL << 26)     // SysTick pending bit
-#define SYST_RVR  (*(volatile U32*) (0xE000E014uL)) // SysTick Reload Value Register
-#define SYST_CVR  (*(volatile U32*) (0xE000E018uL)) // SysTick Current Value Register
 
 /*********************************************************************
 *
@@ -84,7 +80,7 @@ extern unsigned int SEGGER_SYSVIEW_TickCnt;
 #define SYSVIEW_DEVICE_NAME     "nxg_court atmel_sam0 arm"
 
 // Frequency of the timestamp. Must match SEGGER_SYSVIEW_Conf.h
-#define SYSVIEW_TIMESTAMP_FREQ  (CONF_CPU_FREQUENCY)
+#define SYSVIEW_TIMESTAMP_FREQ  (CONF_GCLK_TC4_FREQUENCY)
 
 // System Frequency. SystemcoreClock is used in most CMSIS compatible projects.
 #define SYSVIEW_CPU_FREQ        (CONF_CPU_FREQUENCY)
@@ -117,8 +113,20 @@ static void _cbSendSystemDesc(void) {
 *
 **********************************************************************
 */
+void increment_timestamp(const struct timer_task *const timer_task)
+{
+  SEGGER_SYSVIEW_TickCnt++;
+  SEGGER_SYSVIEW_RecordEnterISR();
+  wake_up_tc_timestamp = true;
+  SEGGER_SYSVIEW_RecordExitISR();
+}
+
+struct timer_task task_timestamp = {{0}, 0, 1, &increment_timestamp, TIMER_TASK_REPEAT};
+
 void SEGGER_SYSVIEW_Conf(void) {
-  SysTick->CTRL |= (1 << SysTick_CTRL_TICKINT_Pos);
+  timer_start(&TIMER_0);
+  timer_add_task(&TIMER_0, &task_timestamp);
+
   SEGGER_SYSVIEW_Init(SYSVIEW_TIMESTAMP_FREQ, SYSVIEW_CPU_FREQ, 
                       0, _cbSendSystemDesc);
   SEGGER_SYSVIEW_SetRAMBase(SYSVIEW_RAM_BASE);
@@ -142,135 +150,32 @@ void SEGGER_SYSVIEW_Conf(void) {
 *   disabled. Therefore locking here is not required.
 */
 
-static void *hardware;
-
-#if CONF_CPU_FREQUENCY < 1000
-#define CPU_FREQ_POWER 3
-#elif CONF_CPU_FREQUENCY < 10000
-#define CPU_FREQ_POWER 4
-#elif CONF_CPU_FREQUENCY < 100000
-#define CPU_FREQ_POWER 5
-#elif CONF_CPU_FREQUENCY < 1000000
-#define CPU_FREQ_POWER 6
-#elif CONF_CPU_FREQUENCY < 10000000
-#define CPU_FREQ_POWER 7
-#elif CONF_CPU_FREQUENCY < 100000000
-#define CPU_FREQ_POWER 8
-#endif
-
-static inline uint32_t _dummy_get_cycles_for_ms_internal(const uint16_t ms, const uint32_t freq, const uint8_t power)
-{
-	switch (power) {
-	case 8:
-		return (ms * (freq / 100000) + 2) / 3 * 100;
-	case 7:
-		return (ms * (freq / 10000) + 2) / 3 * 10;
-	case 6:
-		return (ms * (freq / 1000) + 2) / 3;
-	case 5:
-		return (ms * (freq / 100) + 29) / 30;
-	case 4:
-		return (ms * (freq / 10) + 299) / 300;
-	default:
-		return (ms * (freq / 1) + 2999) / 3000;
-	}
-}
-
-static inline uint32_t _dummy_get_cycles_for_us_internal(const uint16_t us, const uint32_t freq, const uint8_t power)
-{
-	switch (power) {
-	case 8:
-		return (us * (freq / 100000) + 29) / 30;
-	case 7:
-		return (us * (freq / 10000) + 299) / 300;
-	case 6:
-		return (us * (freq / 1000) + 2999) / 3000;
-	case 5:
-		return (us * (freq / 100) + 29999) / 30000;
-	case 4:
-		return (us * (freq / 10) + 299999) / 300000;
-	default:
-		return (us * freq + 2999999) / 3000000;
-	}
-}
-
-uint32_t _dummy_get_cycles_for_ms(const uint16_t ms)
-{
-	return _dummy_get_cycles_for_ms_internal(ms, CONF_CPU_FREQUENCY, CPU_FREQ_POWER);
-}
-
-uint32_t _dummy_get_cycles_for_us(const uint16_t us)
-{
-	return _dummy_get_cycles_for_us_internal(us, CONF_CPU_FREQUENCY, CPU_FREQ_POWER);
-}
-
-void _dummy_delay_cycles(void *const hw, uint32_t cycles)
-{
-#ifndef _UNIT_TEST_
-	(void)hw;
-	(void)cycles;
-#if defined __GNUC__
-	__asm(".syntax unified\n"
-	      "__delay:\n"
-	      "subs r1, r1, #1\n"
-	      "bhi __delay\n"
-	      ".syntax divided");
-#elif defined __CC_ARM
-	__asm("__delay:\n"
-	      "subs cycles, cycles, #1\n"
-	      "bhi __delay\n");
-#elif defined __ICCARM__
-	__asm("__delay:\n"
-	      "subs r1, r1, #1\n"
-	      "bhi __delay\n");
-#endif
-#endif
-}
-
-#ifdef SEGGER_SYSTEM_VIEW
-
-void delay_us(const uint16_t us)
-{
-	SEGGER_SYSVIEW_RecordU32(e_delay_us, us);
-	_dummy_delay_cycles(hardware, _dummy_get_cycles_for_us(us));
-	SEGGER_SYSVIEW_RecordEndCall(e_delay_us);
-}
-void delay_ms(const uint16_t ms)
-{
-	SEGGER_SYSVIEW_RecordU32(e_delay_ms, ms);
-	_dummy_delay_cycles(hardware, _dummy_get_cycles_for_ms(ms));
-	SEGGER_SYSVIEW_RecordEndCall(e_delay_ms);
-}
-
-void SysTick_Handler()
-{
-  SEGGER_SYSVIEW_TickCnt++;
-}
-#endif
-
 U32 SEGGER_SYSVIEW_X_GetTimestamp(void) {
-  U32 TickCount;
+  static U32 OldTickCount = 0;
+  static U32 OldCycles = 0;
   U32 Cycles;
+  U32 TickCount;
   U32 CyclesPerTick;
   //
   // Get the cycles of the current system tick.
   // SysTick is down-counting, subtract the current value from the number of cycles per tick.
   //
-  CyclesPerTick = SYST_RVR + 1;
-  Cycles = (CyclesPerTick - SYST_CVR);
+  timer_get_clock_cycles_in_tick(&TIMER_0, &CyclesPerTick);
+  Cycles = hri_tccount32_read_COUNT_COUNT_bf(TIMER_0.device.hw);
   //
   // Get the system tick count.
   //
   TickCount = SEGGER_SYSVIEW_TickCnt;
-  //
-  // If a SysTick interrupt is pending, re-read timer and adjust result
-  //
-  if ((SCB_ICSR & SCB_ICSR_PENDSTSET_MASK) != 0) {
-    Cycles = (CyclesPerTick - SYST_CVR);
-    TickCount++;
+
+  if (Cycles < OldCycles && TickCount <= OldTickCount)
+  {
+    TickCount = OldTickCount + 1;
   }
-  Cycles += TickCount * CyclesPerTick;
-  return Cycles;
+
+  OldTickCount = TickCount;
+  OldCycles = Cycles;
+
+  return Cycles + TickCount * CyclesPerTick;
 }
 
 /*********************************************************************

@@ -319,7 +319,7 @@
 // <i> Indicates whether Run in Standby is enabled or not
 // <id> gclk_arch_gen_4_RUNSTDBY
 #ifndef CONF_GCLK_GEN_4_RUNSTDBY
-#define CONF_GCLK_GEN_4_RUNSTDBY 0
+#define CONF_GCLK_GEN_4_RUNSTDBY 1
 #endif
 
 // <q> Divide Selection
@@ -379,7 +379,7 @@
 // <i>
 // <id> gclk_gen_4_div
 #ifndef CONF_GCLK_GEN_4_DIV
-#define CONF_GCLK_GEN_4_DIV 128
+#define CONF_GCLK_GEN_4_DIV 1
 #endif
 
 // </h>

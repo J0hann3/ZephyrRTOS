@@ -82,6 +82,7 @@ Additional information:
 **********************************************************************
 */
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef enum e_sysview_id_task
 {
@@ -100,6 +101,8 @@ typedef enum e_sysview_id_task
 	e_wake_up_sd_card,
 	e_sleep_sd_card,
 } t_sysview_event;
+
+extern bool wake_up_tc_timestamp;
 
 #endif  // SEGGER_SYSVIEW_CONF_H
 

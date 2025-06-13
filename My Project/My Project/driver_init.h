@@ -25,9 +25,13 @@ extern "C" {
 
 #include <hal_i2c_m_sync.h>
 
+#include <hal_timer.h>
+#include <hpl_tc_base.h>
+
 extern struct usart_sync_descriptor USART_0;
 
 extern struct i2c_m_sync_desc       I2C_0;
+extern struct timer_descriptor    TIMER_0;
 
 void USART_0_PORT_init(void);
 void USART_0_CLOCK_init(void);

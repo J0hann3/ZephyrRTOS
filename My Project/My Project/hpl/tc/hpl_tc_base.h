@@ -1,7 +1,7 @@
 /**
  * \file
  *
- * \brief HAL delay related functionality implementation.
+ * \brief SAM Timer/Counter
  *
  * Copyright (c) 2014-2018 Microchip Technology Inc. and its subsidiaries.
  *
@@ -28,53 +28,50 @@
  * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
  *
  * \asf_license_stop
+ */
+
+#ifndef _HPL_TC_BASE_H_INCLUDED
+#define _HPL_TC_BASE_H_INCLUDED
+
+#include <hpl_timer.h>
+#include <hpl_pwm.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * \addtogroup tc_group TC Hardware Proxy Layer
  *
+ * \section tc_hpl_rev Revision History
+ * - v0.0.0.1 Initial Commit
+ *
+ *@{
  */
-
-#include <hpl_irq.h>
-#include <hpl_reset.h>
-#include <hpl_sleep.h>
-#include "hal_delay.h"
-#include <hpl_delay.h>
 
 /**
- * \brief Driver version
+ * \name HPL functions
  */
-#define DRIVER_VERSION 0x00000001u
+//@{
 
 /**
- * \brief The pointer to a hardware instance used by the driver.
+ * \brief Retrieve timer helper functions
+ *
+ * \return A pointer to set of timer helper functions
  */
-static void *hardware;
+struct _timer_hpl_interface *_tc_get_timer(void);
 
 /**
- * \brief Initialize Delay driver
+ * \brief Retrieve pwm helper functions
+ *
+ * \return A pointer to set of pwm helper functions
  */
-void delay_init(void *const hw)
-{
-	_delay_init(hardware = hw);
+struct _pwm_hpl_interface *_tc_get_pwm(void);
+
+//@}
+/**@}*/
+
+#ifdef __cplusplus
 }
-
-/**
- * \brief Perform delay in us
- */
-void delay_us(const uint16_t us)
-{
-	_delay_cycles(hardware, _get_cycles_for_us(us));
-}
-
-/**
- * \brief Perform delay in ms
- */
-void delay_ms(const uint16_t ms)
-{
-	_delay_cycles(hardware, _get_cycles_for_ms(ms));
-}
-
-/**
- * \brief Retrieve the current driver version
- */
-uint32_t delay_get_version(void)
-{
-	return DRIVER_VERSION;
-}
+#endif
+#endif /* _HPL_TC_BASE_H_INCLUDED */

@@ -468,7 +468,6 @@ void SYS_FS_Tasks ( void )
   Remarks:
     See sys_fs.h for usage information.
 ***************************************************************************/
-
 SYS_FS_RESULT SYS_FS_Mount
 (
     const char *devName,
