@@ -171,7 +171,12 @@ U32 SEGGER_SYSVIEW_X_GetTimestamp(void) {
   {
     TickCount = OldTickCount + 1;
   }
+  else if (TickCount < OldTickCount)
+  {
+    TickCount = OldTickCount;
+  }
 
+  // SEGGER_RTT_printf(0, "Cycles: %d, OldCycles: %d, ticks: %d, OldTicks: %d\n",Cycles, OldCycles, TickCount, OldTickCount);
   OldTickCount = TickCount;
   OldCycles = Cycles;
 

@@ -3,6 +3,7 @@
 #include "measures_logger.h"
 #include "sd_card_driver/definitions.h"
 #include "tools.h"
+#include "calendar.h"
 #include "SEGGER_RTT.h"
 #include "SEGGER_SYSVIEW_Conf.h"
 #include "SEGGER_SYSVIEW.h"
@@ -100,17 +101,24 @@ int main(void)
 	// SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_NO_BLOCK_SKIP);
 	// SEGGER_RTT_WriteString(0, RTT_CTRL_TEXT_BRIGHT_YELLOW"Welcome here\n"RTT_CTRL_RESET);
 	SEGGER_SYSVIEW_Conf();
+	// SEGGER_SYSVIEW_Start();
 	SEGGER_SYSVIEW_OnTaskCreate(MAIN_TASK);
-	SEGGER_SYSVIEW_OnTaskStartExec(MAIN_TASK);
+	SEGGER_SYSVIEW_OnTaskStartExec(MAIN_TASK);   
 	
 	while (1)
 	{
 		if (current_measure.LUM_SENSOR_EN && init_and_read_lum_sensor(i2c_lum,
 					&current_measure.brightness) == 1 )
+		{
+			SEGGER_SYSVIEW_Error("Error light sensor\n");
 			return 1;
+		}
 		if (current_measure.TEMP_HUM_SENSOR_EN && read_temp_sensor(i2c_temp, &current_measure.temperature,
 					&current_measure.humidity) == 1 )
+		{
+			SEGGER_SYSVIEW_Error("Error temp sensor\n");
 			return 1;
+		}
 		measures_logger_write(&current_measure);
 		size_t count = measures_logger_count();
 		uint16_t size = measures_logger_get_size();
@@ -120,14 +128,20 @@ int main(void)
 		}
 		if (wake_up_tc_timestamp)
 			wake_up_tc_timestamp = false;
+		if (wake_up_calendar)
+			wake_up_calendar = false;
 		SEGGER_SYSVIEW_OnIdle();
 		_go_to_sleep();
-		while (wake_up_tc_timestamp)
+		SEGGER_SYSVIEW_OnTaskStartExec(MAIN_TASK);
+
+		while (wake_up_tc_timestamp && !wake_up_calendar)
 		{
 			wake_up_tc_timestamp = false;
+			SEGGER_SYSVIEW_OnIdle();
 			_go_to_sleep();
+			SEGGER_SYSVIEW_OnTaskStartExec(MAIN_TASK);
 		}
-		SEGGER_SYSVIEW_OnTaskStartExec(MAIN_TASK);
 	}
+	SEGGER_SYSVIEW_Error("Error end while\n");
 	return 0;
 }

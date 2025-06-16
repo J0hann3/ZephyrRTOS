@@ -2,12 +2,15 @@
 #include <hpl_gclk_base.h>
 #include <hpl_pm_base.h>
 #include <peripheral_clk_config.h>
+#include "calendar.h"
 
 #ifdef DEBUG
 #include "printf.h"
 #endif
 
 struct calendar_descriptor CALENDAR_0;
+
+bool wake_up_calendar = false;
 
 static struct calendar_alarm CALENDAR_0_task_wdt0, CALENDAR_0_task_wdt1, CALENDAR_0_task_wdt2, CALENDAR_0_task_wdt3, CALENDAR_0_task_wdt4, CALENDAR_0_task_wdt5;
 
@@ -76,6 +79,7 @@ static void CALENDAR_0_task_wdt_callback(struct calendar_descriptor *const descr
 {
     SEGGER_SYSVIEW_RecordEnterISR();
 	(void)descr;
+    wake_up_calendar = true;
     SEGGER_SYSVIEW_RecordExitISR();
     return;
 }
