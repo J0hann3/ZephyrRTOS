@@ -106,6 +106,33 @@ extern unsigned int SEGGER_SYSVIEW_TickCnt;
 static void _cbSendSystemDesc(void) {
   SEGGER_SYSVIEW_SendSysDesc("N="SYSVIEW_APP_NAME",O=NoOS_NxgCourt,D="SYSVIEW_DEVICE_NAME);
   SEGGER_SYSVIEW_SendSysDesc("I#15=SysTick");
+
+  // Data plot register
+  SEGGER_SYSVIEW_DATA_REGISTER TempPlot;
+  
+  TempPlot.ID = 0;
+  TempPlot.sName = "Temp sensor";
+  TempPlot.DataType = SEGGER_SYSVIEW_TYPE_U32;
+  TempPlot.Offset = 0;
+  TempPlot.RangeMin = -40;
+  TempPlot.RangeMax = 1250;
+  TempPlot.ScalingFactor = 1;
+  TempPlot.sUnit = "°C";
+
+  SEGGER_SYSVIEW_RegisterData(&TempPlot);
+
+  SEGGER_SYSVIEW_DATA_REGISTER HumPlot;
+  
+  HumPlot.ID = 1;
+  HumPlot.sName = "Humidity sensor";
+  HumPlot.DataType = SEGGER_SYSVIEW_TYPE_U32;
+  HumPlot.Offset = 0;
+  HumPlot.RangeMin = 0;
+  HumPlot.RangeMax = 1000;
+  HumPlot.ScalingFactor = 1;
+  HumPlot.sUnit = "%RH";
+
+  SEGGER_SYSVIEW_RegisterData(&HumPlot);
 }
 
 /*********************************************************************

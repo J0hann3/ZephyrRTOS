@@ -46,6 +46,18 @@ uint8_t read_temp_sensor(struct io_descriptor *temp_device, uint16_t *temp, uint
 	//(*humidity) = -6 + 125 * (*humidity) / 65535;
 
 	SEGGER_SYSVIEW_PrintfHost("Temperature: %d, Humidity %d\n", ((*temp) - 1000) / 10, (*humidity)/ 10);
+
+	SEGGER_SYSVIEW_DATA_SAMPLE TempPlot;
+	U32 temperature = ((*temp) - 1000);
+	TempPlot.ID = 0;
+	TempPlot.pValue.pU32 = &temperature;
+	SEGGER_SYSVIEW_SampleData(&TempPlot);
+
+	U32 hum = (*humidity);
+	SEGGER_SYSVIEW_DATA_SAMPLE HumPlot;
+	HumPlot.ID = 1;
+	HumPlot.pValue.pU32 = &hum;
+	SEGGER_SYSVIEW_SampleData(&HumPlot);
 #ifdef DEBUG
 	printf("Temperature: %d, Humidity %d\n", ((*temp) - 1000) / 10, (*humidity)/ 10);
 #endif
