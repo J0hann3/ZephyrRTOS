@@ -3,7 +3,7 @@
 *                        The Embedded Experts                        *
 **********************************************************************
 *                                                                    *
-*            (c) 1995 - 2021 SEGGER Microcontroller GmbH             *
+*            (c) 1995 - 2024 SEGGER Microcontroller GmbH             *
 *                                                                    *
 *       www.segger.com     Support: support@segger.com               *
 *                                                                    *
@@ -42,70 +42,43 @@
 *                                                                    *
 **********************************************************************
 *                                                                    *
-*       SystemView version: 3.30                                    *
+*       SystemView version: 3.60e                                    *
 *                                                                    *
 **********************************************************************
--------------------------- END-OF-HEADER -----------------------------
-
-File    : SEGGER_SYSVIEW_Config_embOS_Zynq7000.c
-Purpose : Sample setup configuration of SystemView with embOS
-          on Xilinx Zynq 7010 devices.
-Revision: $Rev: 12316 $
-
-Additional information:
-  SEGGER_SYSVIEW_TickCnt must be incremented in the SysTick
-  handler before any SYSVIEW event is generated.
- 
-  Example in embOS RTOSInit.c:
- 
-  void SysTick_Handler(void) {
-  #if (OS_PROFILE != 0)
-    SEGGER_SYSVIEW_TickCnt++;  // Increment SEGGER_SYSVIEW_TickCnt before calling OS_INT_EnterNestable().
-  #endif
-    OS_INT_EnterNestable();
-    OS_TICK_Handle();
-    OS_INT_LeaveNestable();
-  }
-  
-  SEGGER_SYSVIEW_InterruptId has to be set in the IRQ handler
-  to identify the active interrupt.
+---------------------------END-OF-HEADER------------------------------
+File    : SEGGER_RTT_Syscalls_GCC.c
+Purpose : Low-level functions for using printf() via RTT in GCC.
+          To use RTT for printf output, include this file in your 
+          application.
+Revision: $Rev: 24316 $
+----------------------------------------------------------------------
 */
-#include "RTOS.h"
-#include "SEGGER_SYSVIEW.h"
-#include "SEGGER_SYSVIEW_embOS.h"
+#if (defined __GNUC__) && !(defined __SES_ARM) && !(defined __CROSSWORKS_ARM) && !(defined __ARMCC_VERSION) && !(defined __CC_ARM)
+
+#include <reent.h>  // required for _write_r
+#include "SEGGER_RTT.h"
+
 
 /*********************************************************************
 *
-*       Defines, fixed
+*       Types
 *
 **********************************************************************
 */
+//
+// If necessary define the _reent struct
+// to match the one passed by the used standard library.
+//
+struct _reent;
 
 /*********************************************************************
 *
-*       Local functions
+*       Function prototypes
 *
 **********************************************************************
 */
-/*********************************************************************
-*
-*       _cbSendSystemDesc()
-*
-*  Function description
-*    Sends SystemView description strings.
-*/
-static void _cbSendSystemDesc(void) {
-  SEGGER_SYSVIEW_SendSysDesc("N=" SEGGER_SYSVIEW_APP_NAME ",O=embOS,D=" SEGGER_SYSVIEW_DEVICE_NAME );
-#ifdef SEGGER_SYSVIEW_SYSDESC0
-  SEGGER_SYSVIEW_SendSysDesc(SEGGER_SYSVIEW_SYSDESC0);
-#endif
-#ifdef SEGGER_SYSVIEW_SYSDESC1
-  SEGGER_SYSVIEW_SendSysDesc(SEGGER_SYSVIEW_SYSDESC1);
-#endif
-#ifdef SEGGER_SYSVIEW_SYSDESC2
-  SEGGER_SYSVIEW_SendSysDesc(SEGGER_SYSVIEW_SYSDESC2);
-#endif
-}
+_ssize_t _write  (int file, const void *ptr, size_t len);
+_ssize_t _write_r(struct _reent *r, int file, const void *ptr, size_t len);
 
 /*********************************************************************
 *
@@ -113,56 +86,39 @@ static void _cbSendSystemDesc(void) {
 *
 **********************************************************************
 */
+
 /*********************************************************************
 *
-*       SEGGER_SYSVIEW_Conf()
+*       _write()
 *
 * Function description
-*   Configure and initialize SystemView and register it with embOS.
-*
-* Additional information
-*   If enabled, SEGGER_SYSVIEW_Conf() will also immediately start
-*   recording events with SystemView.
+*   Low-level write function.
+*   libc subroutines will use this system routine for output to all files,
+*   including stdout.
+*   Write data via RTT.
 */
-void SEGGER_SYSVIEW_Conf(void) {
-  SEGGER_SYSVIEW_Init(SEGGER_SYSVIEW_TIMESTAMP_FREQ, SEGGER_SYSVIEW_CPU_FREQ,
-                      &SYSVIEW_X_OS_TraceAPI, _cbSendSystemDesc);
-  OS_TRACE_SetAPI(&embOS_TraceAPI_SYSVIEW);  // Configure embOS to use SYSVIEW.
-#if SEGGER_SYSVIEW_START_ON_INIT
-  SEGGER_SYSVIEW_Start();                    // Start recording to catch system initialization.
+// _ssize_t _write(int file, const void *ptr, size_t len) {
+//   (void) file;  /* Not used, avoid warning */
+//   SEGGER_RTT_Write(0, ptr, len);
+//   return len;
+// }
+
+/*********************************************************************
+*
+*       _write_r()
+*
+* Function description
+*   Low-level reentrant write function.
+*   libc subroutines will use this system routine for output to all files,
+*   including stdout.
+*   Write data via RTT.
+*/
+_ssize_t _write_r(struct _reent *r, int file, const void *ptr, size_t len) {
+  (void) file;  /* Not used, avoid warning */
+  (void) r;     /* Not used, avoid warning */
+  SEGGER_RTT_Write(0, ptr, len);
+  return len;
+}
+
 #endif
-}
-
-/*********************************************************************
-*
-*       SEGGER_SYSVIEW_X_GetTimestamp()
-*
-* Function description
-*   Returns the current timestamp in cycles using the system tick
-*   count and the SysTick counter.
-*   All parameters of the SysTick have to be known and are set via
-*   configuration defines on top of the file.
-*
-* Return value
-*   The current timestamp.
-*
-* Additional information
-*   SEGGER_SYSVIEW_X_GetTimestamp is always called when interrupts are
-*   disabled. Therefore locking here is not required.
-*/
-U32 SEGGER_SYSVIEW_X_GetTimestamp(void) {
-  U32 Cycles;
-  
-  Cycles = RTOSINIT__SYSVIEWGetTimerCycles();
-  return Cycles;
-}
-
-/*********************************************************************
-*
-*       SEGGER_SYSVIEW_X_GetInterruptId()
-*/
-U32 SEGGER_SYSVIEW_X_GetInterruptId(void) {
-  return SEGGER_SYSVIEW_InterruptId;
-}
-
-/*************************** End of file ****************************/
+/****** End Of File *************************************************/

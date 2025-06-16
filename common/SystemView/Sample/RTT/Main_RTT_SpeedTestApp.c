@@ -3,7 +3,7 @@
 *                        The Embedded Experts                        *
 **********************************************************************
 *                                                                    *
-*            (c) 1995 - 2021 SEGGER Microcontroller GmbH             *
+*            (c) 1995 - 2024 SEGGER Microcontroller GmbH             *
 *                                                                    *
 *       www.segger.com     Support: support@segger.com               *
 *                                                                    *
@@ -42,58 +42,64 @@
 *                                                                    *
 **********************************************************************
 *                                                                    *
-*       SystemView version: 3.32                                    *
+*       SystemView version: 3.60e                                    *
 *                                                                    *
 **********************************************************************
--------------------------- END-OF-HEADER -----------------------------
-File    : SEGGER_SYSVIEW_Int.h
-Purpose : SEGGER SystemView internal header.
-Revision: $Rev: 21281 $
+--------- END-OF-HEADER --------------------------------------------
+File    : Main_RTT_SpeedTestApp.c
+Purpose : Sample program for measuring RTT performance.
 */
 
-#ifndef SEGGER_SYSVIEW_INT_H
-#define SEGGER_SYSVIEW_INT_H
+#include "RTOS.h"
+#include "BSP.h"
 
-/*********************************************************************
-*
-*       #include Section
-*
-**********************************************************************
-*/
+#include "SEGGER_RTT.h"
+#include <stdio.h>
 
-#include "SEGGER_SYSVIEW.h"
+OS_STACKPTR int StackHP[128], StackLP[128];          /* Task stacks */
+OS_TASK TCBHP, TCBLP;                        /* Task-control-blocks */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
-/*********************************************************************
-*
-*       Private data types
-*
-**********************************************************************
-*/
-//
-// Commands that Host can send to target
-//
-typedef enum {
-  SEGGER_SYSVIEW_COMMAND_ID_START = 1,
-  SEGGER_SYSVIEW_COMMAND_ID_STOP,
-  SEGGER_SYSVIEW_COMMAND_ID_GET_SYSTIME,
-  SEGGER_SYSVIEW_COMMAND_ID_GET_TASKLIST,
-  SEGGER_SYSVIEW_COMMAND_ID_GET_SYSDESC,
-  SEGGER_SYSVIEW_COMMAND_ID_GET_NUMMODULES,
-  SEGGER_SYSVIEW_COMMAND_ID_GET_MODULEDESC,
-  SEGGER_SYSVIEW_COMMAND_ID_HEARTBEAT = 127,
-  // Extended commands: Commands >= 128 have a second parameter
-  SEGGER_SYSVIEW_COMMAND_ID_GET_MODULE = 128
-} SEGGER_SYSVIEW_COMMAND_ID;
-
-#ifdef __cplusplus
+static void HPTask(void) {
+  while (1) {
+    //
+    // Measure time needed for RTT output
+    // Perform dummy write with 0 characters, so we know the overhead of toggling LEDs and RTT in general
+    //
+// Set BP here. Then start sampling on scope
+    BSP_ClrLED(0);
+    SEGGER_RTT_Write(0, 0, 0);
+    BSP_SetLED(0);
+    BSP_ClrLED(0);
+    SEGGER_RTT_Write(0, "01234567890123456789012345678901234567890123456789012345678901234567890123456789\r\n", 82);
+    BSP_SetLED(0);
+// Set BP here. Then stop sampling on scope
+    OS_Delay(200);
+  }
 }
-#endif
 
-#endif
+static void LPTask(void) {
+  while (1) {
+    BSP_ToggleLED(1);
+    OS_Delay (500);
+  }
+}
 
-/*************************** End of file ****************************/
+/*********************************************************************
+*
+*       main
+*
+*********************************************************************/
+
+int main(void) {
+  OS_IncDI();                      /* Initially disable interrupts  */
+  OS_InitKern();                   /* Initialize OS                 */
+  OS_InitHW();                     /* Initialize Hardware for OS    */
+  BSP_Init();                      /* Initialize LED ports          */
+  BSP_SetLED(0);
+  /* You need to create at least one task before calling OS_Start() */
+  OS_CREATETASK(&TCBHP, "HP Task", HPTask, 100, StackHP);
+  OS_CREATETASK(&TCBLP, "LP Task", LPTask,  50, StackLP);
+  OS_Start();                      /* Start multitasking            */
+  return 0;
+}
+

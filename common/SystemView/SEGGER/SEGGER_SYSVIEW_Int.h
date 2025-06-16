@@ -3,7 +3,7 @@
 *                        The Embedded Experts                        *
 **********************************************************************
 *                                                                    *
-*            (c) 1995 - 2021 SEGGER Microcontroller GmbH             *
+*            (c) 1995 - 2024 SEGGER Microcontroller GmbH             *
 *                                                                    *
 *       www.segger.com     Support: support@segger.com               *
 *                                                                    *
@@ -42,83 +42,58 @@
 *                                                                    *
 **********************************************************************
 *                                                                    *
-*       SystemView version: 3.30                                    *
+*       SystemView version: 3.60e                                    *
 *                                                                    *
 **********************************************************************
 -------------------------- END-OF-HEADER -----------------------------
-
-File    : SEGGER_SYSVIEW_Conf.h
-Purpose : SEGGER SystemView configuration file.
-          Set defines which deviate from the defaults (see SEGGER_SYSVIEW_ConfDefaults.h) here.          
-Revision: $Rev: 17066 $
-
-Additional information:
-  Required defines which must be set are:
-    SEGGER_SYSVIEW_GET_TIMESTAMP
-    SEGGER_SYSVIEW_GET_INTERRUPT_ID
-  For known compilers and cores, these might be set to good defaults
-  in SEGGER_SYSVIEW_ConfDefaults.h.
-  
-  SystemView needs a (nestable) locking mechanism.
-  If not defined, the RTT locking mechanism is used,
-  which then needs to be properly configured.
+File    : SEGGER_SYSVIEW_Int.h
+Purpose : SEGGER SystemView internal header.
+Revision: $Rev: 21281 $
 */
 
-#ifndef SEGGER_SYSVIEW_CONF_H
-#define SEGGER_SYSVIEW_CONF_H
+#ifndef SEGGER_SYSVIEW_INT_H
+#define SEGGER_SYSVIEW_INT_H
 
 /*********************************************************************
 *
-*       Defines, configurable
+*       #include Section
 *
 **********************************************************************
 */
 
+#include "SEGGER_SYSVIEW.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 /*********************************************************************
 *
-*       Defines, configurable
+*       Private data types
 *
 **********************************************************************
 */
-#ifndef   OS_FSYS
-  #define OS_FSYS                  (399900000u)
+//
+// Commands that Host can send to target
+//
+typedef enum {
+  SEGGER_SYSVIEW_COMMAND_ID_START = 1,
+  SEGGER_SYSVIEW_COMMAND_ID_STOP,
+  SEGGER_SYSVIEW_COMMAND_ID_GET_SYSTIME,
+  SEGGER_SYSVIEW_COMMAND_ID_GET_TASKLIST,
+  SEGGER_SYSVIEW_COMMAND_ID_GET_SYSDESC,
+  SEGGER_SYSVIEW_COMMAND_ID_GET_NUMMODULES,
+  SEGGER_SYSVIEW_COMMAND_ID_GET_MODULEDESC,
+  SEGGER_SYSVIEW_COMMAND_ID_HEARTBEAT = 127,
+  // Extended commands: Commands >= 128 have a second parameter
+  SEGGER_SYSVIEW_COMMAND_ID_GET_MODULE = 128
+} SEGGER_SYSVIEW_COMMAND_ID;
+
+#ifdef __cplusplus
+}
 #endif
 
-#ifndef   OS_PCLK_TIMER
-  #define OS_PCLK_TIMER            (OS_FSYS / 12)
 #endif
-
-#ifndef   OS_TICK_FREQ
-  #define OS_TICK_FREQ             (1000)
-#endif
-
-#ifndef   OS_TIMER_RELOAD
-  #define OS_TIMER_RELOAD          (OS_PCLK_TIMER / OS_TICK_FREQ)
-#endif
-
-// The application name to be displayed in SystemViewer
-#define SEGGER_SYSVIEW_APP_NAME        "embOS start project"
-
-// The target device name
-#define SEGGER_SYSVIEW_DEVICE_NAME     "R7S721001"
-
-// Frequency of the timestamp
-#define SEGGER_SYSVIEW_TIMESTAMP_FREQ  (OS_PCLK_TIMER)
-
-// System Frequency. SystemcoreClock is used in most CMSIS compatible projects.
-#define SEGGER_SYSVIEW_CPU_FREQ        (OS_FSYS)
-
-// Lowest Id reported by the Application.
-#define SEGGER_SYSVIEW_ID_BASE         (0x60000000)
-
-#define SEGGER_SYSVIEW_SYSDESC0        "I#134=OS_ISR_Tick"
-
-// Retrieve a system timestamp via user-defined function
-#define SEGGER_SYSVIEW_GET_TIMESTAMP() SEGGER_SYSVIEW_X_GetTimestamp()
-
-// Get the currently active interrupt Id from the user-provided function.
-#define SEGGER_SYSVIEW_GET_INTERRUPT_ID()   SEGGER_SYSVIEW_X_GetInterruptId()
-
-#endif  // SEGGER_SYSVIEW_CONF_H
 
 /*************************** End of file ****************************/

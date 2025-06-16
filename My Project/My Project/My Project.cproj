@@ -242,10 +242,8 @@
       <Value>../sd_card_driver/system/fs/fat_fs/file_system</Value>
       <Value>../sd_card_driver/system/fs/fat_fs/hardware_access</Value>
       <Value>../measures_logger</Value>
-      <Value>../RTT/RTT</Value>
-      <Value>../SystemView/SEGGER</Value>
-      <Value>../SystemView/SYSVIEW</Value>
       <Value>../SystemView/Config</Value>
+      <Value>../SystemView/SEGGER</Value>
       <Value>../Config</Value>
       <Value>../</Value>
       <Value>../examples</Value>
@@ -868,30 +866,6 @@
     <Compile Include="printf.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="RTT\RTT\SEGGER_RTT.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="RTT\RTT\SEGGER_RTT.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="RTT\RTT\SEGGER_RTT_ASM_ARMv7M.S">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="RTT\RTT\SEGGER_RTT_Conf.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="RTT\RTT\SEGGER_RTT_printf.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="RTT\Syscalls\SEGGER_RTT_Syscalls_IAR.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="RTT\Syscalls\SEGGER_RTT_Syscalls_KEIL.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="RTT\Syscalls\SEGGER_RTT_Syscalls_SES.c">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="sd_card_driver.c">
       <SubType>compile</SubType>
     </Compile>
@@ -1069,25 +1043,49 @@
     <Compile Include="SystemView\Config\Global.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="SystemView\Config\SEGGER_RTT_Conf.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="SystemView\Config\SEGGER_SYSVIEW_Conf.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="SystemView\SEGGER\SEGGER.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="SystemView\SYSVIEW\SEGGER_SYSVIEW.c">
+    <Compile Include="SystemView\SEGGER\SEGGER_RTT.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="SystemView\SYSVIEW\SEGGER_SYSVIEW.h">
+    <Compile Include="SystemView\SEGGER\SEGGER_RTT.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="SystemView\SYSVIEW\SEGGER_SYSVIEW_ConfDefaults.h">
+    <Compile Include="SystemView\SEGGER\SEGGER_RTT_printf.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="SystemView\SYSVIEW\SEGGER_SYSVIEW_Config_NoOS_CM0.c">
+    <Compile Include="SystemView\SEGGER\SEGGER_SYSVIEW.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="SystemView\SYSVIEW\SEGGER_SYSVIEW_Int.h">
+    <Compile Include="SystemView\SEGGER\SEGGER_SYSVIEW.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="SystemView\SEGGER\SEGGER_SYSVIEW_ConfDefaults.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="SystemView\SEGGER\SEGGER_SYSVIEW_Config_NoOS_CM0.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="SystemView\SEGGER\SEGGER_SYSVIEW_Int.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="SystemView\SEGGER\Syscalls\SEGGER_RTT_Syscalls_GCC.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="SystemView\SEGGER\Syscalls\SEGGER_RTT_Syscalls_IAR.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="SystemView\SEGGER\Syscalls\SEGGER_RTT_Syscalls_KEIL.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="SystemView\SEGGER\Syscalls\SEGGER_RTT_Syscalls_SES.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="temp_hum_sensor.c">
@@ -1126,9 +1124,6 @@
     <Folder Include="hpl\tc\" />
     <Folder Include="hri\" />
     <Folder Include="measures_logger\" />
-    <Folder Include="RTT\" />
-    <Folder Include="RTT\RTT\" />
-    <Folder Include="RTT\Syscalls\" />
     <Folder Include="sd_card_driver\" />
     <Folder Include="sd_card_driver\driver\" />
     <Folder Include="sd_card_driver\driver\sdspi\" />
@@ -1155,7 +1150,7 @@
     <Folder Include="SystemView\" />
     <Folder Include="SystemView\Config\" />
     <Folder Include="SystemView\SEGGER\" />
-    <Folder Include="SystemView\SYSVIEW\" />
+    <Folder Include="SystemView\SEGGER\Syscalls\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Device_Startup\samd21g18a_flash.ld">
@@ -1177,15 +1172,6 @@
       <SubType>compile</SubType>
     </None>
     <None Include="hal\documentation\usart_sync.rst">
-      <SubType>compile</SubType>
-    </None>
-    <None Include="RTT\LICENSE.md">
-      <SubType>compile</SubType>
-    </None>
-    <None Include="RTT\README.md">
-      <SubType>compile</SubType>
-    </None>
-    <None Include="SystemView\README.md">
       <SubType>compile</SubType>
     </None>
   </ItemGroup>

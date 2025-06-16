@@ -3,7 +3,7 @@
 *                        The Embedded Experts                        *
 **********************************************************************
 *                                                                    *
-*            (c) 1995 - 2021 SEGGER Microcontroller GmbH             *
+*            (c) 1995 - 2024 SEGGER Microcontroller GmbH             *
 *                                                                    *
 *       www.segger.com     Support: support@segger.com               *
 *                                                                    *
@@ -42,7 +42,7 @@
 *                                                                    *
 **********************************************************************
 *                                                                    *
-*       SystemView version: 3.32                                    *
+*       SystemView version: 3.60e                                    *
 *                                                                    *
 **********************************************************************
 -------------------------- END-OF-HEADER -----------------------------
@@ -58,6 +58,8 @@ Revision: $Rev: 18540 $
 #include <hpl_time_measure.h>
 #include "driver_init.h"
 
+// SystemcoreClock can be used in most CMSIS compatible projects.
+// In non-CMSIS projects define SYSVIEW_CPU_FREQ.
 extern unsigned int SEGGER_SYSVIEW_TickCnt;
 
 /*********************************************************************
@@ -66,7 +68,6 @@ extern unsigned int SEGGER_SYSVIEW_TickCnt;
 *
 **********************************************************************
 */
-
 /*********************************************************************
 *
 *       Defines, configurable
@@ -93,7 +94,7 @@ extern unsigned int SEGGER_SYSVIEW_TickCnt;
 *       Defines, fixed
 *
 **********************************************************************
-*/                                // Cycle counter enable bit
+*/
 
 /********************************************************************* 
 *
@@ -149,7 +150,6 @@ void SEGGER_SYSVIEW_Conf(void) {
 *   SEGGER_SYSVIEW_X_GetTimestamp is always called when interrupts are
 *   disabled. Therefore locking here is not required.
 */
-
 U32 SEGGER_SYSVIEW_X_GetTimestamp(void) {
   static U32 OldTickCount = 0;
   static U32 OldCycles = 0;
