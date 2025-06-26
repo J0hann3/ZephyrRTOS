@@ -97,24 +97,10 @@ Additional information:
 */
 #include <stdint.h>
 #include <stdbool.h>
+#include "SEGGER_SYSVIEW_Conf.g.h"
 
-typedef enum e_sysview_id_task
-{
-	e_syscall = 32,
-	e_delay_ms,
-	e_delay_us,
-	e_config_light_sensor,
-	e_measure_light,
-	e_measure_temp,
-	e_sd_card_detected,
-	e_open_sd_card,
-	e_close_sd_card,
-	e_mount_sd_card,
-	e_unmount_sd_card,
-	e_write_sd_card,
-	e_wake_up_sd_card,
-	e_sleep_sd_card,
-} t_sysview_event;
+#define MAIN_TASK 0
+#define MAIN_TASK_NAME "Main"
 
 extern bool wake_up_tc_timestamp;
 

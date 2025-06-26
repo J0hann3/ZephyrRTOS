@@ -133,6 +133,16 @@ static void _cbSendSystemDesc(void) {
   HumPlot.sUnit = "%RH";
 
   SEGGER_SYSVIEW_RegisterData(&HumPlot);
+
+  // Create task main
+	SEGGER_SYSVIEW_OnTaskCreate(MAIN_TASK);
+  
+  SEGGER_SYSVIEW_TASKINFO Info = {0};
+	Info.TaskID = (U32)MAIN_TASK;
+	Info.sName = MAIN_TASK_NAME;
+
+	SEGGER_SYSVIEW_SendTaskInfo(&Info);
+	SEGGER_SYSVIEW_OnTaskStartExec(MAIN_TASK);
 }
 
 /*********************************************************************
