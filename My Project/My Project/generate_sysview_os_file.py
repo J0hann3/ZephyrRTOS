@@ -62,6 +62,23 @@ t_functions_header_file = """//
 
 t_endif_header_file = """\n#endif  // SEGGER_SYSVIEW_CONF_G_H\n"""
 
+t_cli_json_format = """Excepted JSON format:
+{
+    "NamedType": [
+        {"TypeName" : "Bool", "Fields" :[{"Key" : "0", "Value" : "false"}, {"Key" : "1", "Value" : "true"}]}
+    ],
+    "Function" : 
+    [
+        {"FunctionName" : "sycall", "ParameterDescription" : "FunctionName=%s"},
+        {"FunctionName" : "delay_ms", "ParameterDescription" : "msec=%u ms", "ReturnValueDescription" : "Returns %u"},
+        {"FunctionName" : "config_light_sensor", "ParameterDescription" : "config= %u, %u, %u", "ReturnValueDescription" : "Returns %u"},
+        {"FunctionName" : "measure_light", "ParameterDescription" : "Start measure", "ReturnValueDescription" : "Returns %u"},
+        {"FunctionName" : "sd_card_detected", "ParameterDescription" : "isDetected=%Bool"},
+        {"FunctionName" : "open_sd_card", "ReturnValueDescription" : "Returns %u"},
+        {"FunctionName" : "close_sd_card"}
+    ]
+}
+"""
 # --------------------  Print Format --------------------
 
 class color:
@@ -278,7 +295,8 @@ def main(args):
         print(f"{color.FAIL}Fail to generate files{color.ENDC}")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(prog="sysview", description=f"usage: example: python {__file__} nxgCourt --json-files sysview.json sysview1.json sysview2.json --path-header .\src\SystemView")
+    parser = argparse.ArgumentParser(description=f"usage: example: python {os.path.basename(__file__)} nxgCourt --json-files sysview.json sysview1.json sysview2.json --path-header .\src\SystemView"\
+                , epilog=t_cli_json_format, formatter_class=argparse.RawDescriptionHelpFormatter,)
     # Mandatory Arguments
     parser.add_argument("-O", "--Os-name", required=True, help='Name of the OS defined in _cbSendSystemDesc(){SEGGER_SYSVIEW_SendSysDesc("O=OsName");}.')
     parser.add_argument("-j", "--json-files", nargs='+', required=True, help="List of all the json file to parse to create the Os description file and header file.")
