@@ -309,6 +309,7 @@ def open_json_file(list_json_file):
     for filename in list_json_file:
         try:
             with open(filename) as file:
+                print(f"{color.OKGREEN}Read Json file:{color.ENDC} '{filename}'")
                 data = json.load(file)
         except Exception as error:
             print_fail(f"Error while parsing json file: '{filename}'")
@@ -328,6 +329,7 @@ def write_os_file_description(path_os_file_description, os_name):
     path = os.path.join(path_os_file_description, 'Description')
     path = os.path.join(path, filename)
     with open(path, 'w') as file:
+        print(f"{color.OKGREEN}Create file:{color.ENDC} '{path}' for OS file description")
         file.write(t_header_os_file.format(file=__file__, filename=filename))
     
         file.write(t_named_type_os_file)
@@ -341,7 +343,7 @@ def write_os_file_description(path_os_file_description, os_name):
         file.write('\n')
 
         file.write(t_end_os_file)
-    print(f"{color.OKGREEN}{filename} is generated{color.ENDC}")
+    print(f"{color.OKGREEN}SUCCESS to generate file{color.ENDC} '{filename}'")
 
 def write_header_file(path_header_file):
     """Create C header file for SystemView with define NamedType and define API Functions"""
@@ -351,6 +353,7 @@ def write_header_file(path_header_file):
     filename = "SEGGER_SYSVIEW_Conf.g.h"
     path = os.path.join(path_header_file, filename)
     with open(path, 'w') as file:
+        print(f"{color.OKGREEN}Create file:{color.ENDC} '{path}' for C header SysView description")
         file.write(t_header_header_file.format(file=__file__, filename=filename))
         file.write(t_ifndef_header_file)
 
@@ -373,7 +376,7 @@ def write_header_file(path_header_file):
             file.write(line)
 
         file.write(t_endif_header_file)
-    print(f"{color.OKGREEN}{filename} is generated{color.ENDC}")
+    print(f"{color.OKGREEN}SUCCESS to generate file{color.ENDC} '{filename}'")
 
 def get_path_os_file_description(args_path_os):
     path_os_file_description = ''
@@ -391,8 +394,7 @@ def main(args):
     print(f"{color.OKCYAN}Start SystemView file generation{color.ENDC}")
     try:
         path_os_file_description = get_path_os_file_description(args.path_OS)
-        print(f"{color.OKGREEN}SYSVIEW_PATH: '{path_os_file_description}'{color.ENDC}")
-        
+        print(f"{color.OKGREEN}Path to SystemView: '{path_os_file_description}'{color.ENDC}")
         dict_json_data = open_json_file(args.json_files)
         NamedType.parse_namedType(dict_json_data)
         Function.parse_function(dict_json_data)
