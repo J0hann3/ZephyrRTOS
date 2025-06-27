@@ -45,6 +45,12 @@ t_header_header_file = """/*\n\
 *   SEGGER_SYSVIEW_RecordEndCallXX(ID_SYSVIEW_FUNCTION, XX) => Should be called to specify the end\n\
 *  of the event that was recorded.\n\
 * \n\
+* You can also use:\n\
+*   record_sysview_function(XX); => if it tasks arguments add as many as needed\n\
+* Where 'function' is the name of the function ID\n\
+* Function that have an enter and exit description must be call like this:\n\
+*   record_sysview_function_enter(XX) or record_sysview_function_exit()\n\
+* \n\
 * Pass NamedType value to SEGGER_SYSVIEW_RecordXX(ID, TYPE_SYSVIEW_xx) if the ID_SYSVIEW takes\n\
 *  NamedType in arguments. \n\
 */\n\n"""
@@ -279,21 +285,45 @@ class Function:
         if hasattr(self, 'ParameterDescription'):
             nb_int, nb_str = self.get_arguments_type(self.ParameterDescription)
             function_name = self.get_function_record(nb_int, nb_str, True)
-            args = '(' + self.get_str_arg_list(nb_int, nb_str) + ')'
-            str +=  args + ' '
-            str += function_name + args
+            args = self.get_str_arg_list(nb_int, nb_str)
+            str += '(' + args + ')' + ' '
+            str += f"{function_name}(ID_SYSVIEW_{self.function_name.upper()}"
+            if len(args) != 0:
+                str += f", {args})"
+            else:
+                str += ")"
             str += f"       // SystenView function: '{self.function_name}', description: '{self.ParameterDescription}'\n"
         else:
-            str += f"() SEGGER_SYSVIEW_RecordVoid()     //SystenView function: '{self.function_name}', no description\n"
+            str += f"() SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_{self.function_name.upper()})     //SystenView function: '{self.function_name}', no description\n"
 
         if hasattr(self, 'ReturnValueDescription'):
             str += f'#define record_sysview_{self.function_name}_exit'
             nb_int, nb_str = self.get_arguments_type(self.ReturnValueDescription)
             function_name = self.get_function_record(nb_int, nb_str, False)
-            args = '(' + self.get_str_arg_list(nb_int, nb_str) + ')'
-            str +=  args + ' '
-            str += function_name + args
+            args = self.get_str_arg_list(nb_int, nb_str)
+            str += '(' + args + ')' + ' '
+            str += f"{function_name}(ID_SYSVIEW_{self.function_name.upper()}, {args})"
             str += f"       // SystenView function: '{self.function_name}', return description: '{self.ReturnValueDescription}'\n"
+        return str
+    
+    def header_macro_empty_function(self):
+        str = f'#define record_sysview_{self.function_name}'
+        if hasattr(self, 'ReturnValueDescription'):
+            str += '_enter'
+        if hasattr(self, 'ParameterDescription'):
+            nb_int, nb_str = self.get_arguments_type(self.ParameterDescription)
+            function_name = self.get_function_record(nb_int, nb_str, True)
+            args = self.get_str_arg_list(nb_int, nb_str)
+            str += '(' + args + ')\n'
+        else:
+            str += f"()\n"
+
+        if hasattr(self, 'ReturnValueDescription'):
+            str += f'#define record_sysview_{self.function_name}_exit'
+            nb_int, nb_str = self.get_arguments_type(self.ReturnValueDescription)
+            function_name = self.get_function_record(nb_int, nb_str, False)
+            args = self.get_str_arg_list(nb_int, nb_str)
+            str += '(' + args + ')\n'
         return str
     
     def parse_function(dict_json_data):
@@ -322,60 +352,86 @@ def open_json_file(list_json_file):
         print_warning("No json file found")
     return dict_json_data
 
-def write_os_file_description(path_os_file_description, os_name):
+def write_custom(file, text: str, on_verbose_version: bool):
+    if verbose and on_verbose_version:
+        print(text, end="")
+    if not dry_run and file != None:
+        file.write(text)
+
+def write_os_file_description(file, filename):
+    write_custom(file, t_header_os_file.format(file=__file__, filename=filename), False)
+
+    write_custom(file, t_named_type_os_file, False)
+    for named_type in NamedType.named_types:
+        write_custom(file,str(named_type), True)
+
+    write_custom(file, '\n', True)
+
+    write_custom(file, t_functions_os_file, False)
+    for function in Function.functions:
+        write_custom(file, str(function), True)
+
+    write_custom(file, '\n', True)
+
+    write_custom(file, t_end_os_file, False)
+
+def generate_os_file_description(path_os_file_description, os_name):
     """Create file Os description for SystemView with NamedType and API Functions"""
 
     filename = "SYSVIEW_" + os_name + ".txt"
     path = os.path.join(path_os_file_description, 'Description')
     path = os.path.join(path, filename)
-    with open(path, 'w') as file:
-        print(f"{color.OKGREEN}Create file:{color.ENDC} '{path}' for OS file description")
-        file.write(t_header_os_file.format(file=__file__, filename=filename))
-    
-        file.write(t_named_type_os_file)
-        for named_type in NamedType.named_types:
-            file.write(str(named_type))
-        file.write('\n')
-
-        file.write(t_functions_os_file)
-        for function in Function.functions:
-            file.write(str(function))
-        file.write('\n')
-
-        file.write(t_end_os_file)
+    print(f"{color.OKGREEN}Create file:{color.ENDC} '{path}' for OS file description")
+    if dry_run:
+        write_os_file_description(None, filename)
+    else:
+        with open(path, 'w') as file:
+            write_os_file_description(file, filename) 
     print(f"{color.OKGREEN}SUCCESS to generate file{color.ENDC} '{filename}'")
 
-def write_header_file(path_header_file):
+def write_header_file(file, filename):
+    write_custom(file, t_header_header_file.format(file=__file__, filename=filename), False)
+    write_custom(file, t_ifndef_header_file, True)
+
+    write_custom(file, t_named_type_header_file, False)
+    for named_type in NamedType.named_types:
+        write_custom(file, f'\n// NamedType {named_type.type_name}\n', True)
+        line = named_type.header_define()
+        write_custom(file, line, True)
+    write_custom(file, '\n', True)
+
+    write_custom(file, t_functions_header_file, False)
+    for function in Function.functions:
+        line = function.header_define_id()
+        write_custom(file, line, True)
+    write_custom(file, '\n', True)
+
+    write_custom(file, t_macro_functions_header_file, False)
+    write_custom(file, "#ifdef SEGGER_SYSTEM_VIEW\n\n", True)
+    for function in Function.functions:
+        line = function.header_macro_function()
+        write_custom(file, line, True)
+    write_custom(file, "\n#else // define SEGGER_SYSTEM_VIEW\n\n", True)
+    for function in Function.functions:
+        line = function.header_macro_empty_function()
+        write_custom(file, line, True)
+    write_custom(file, "\n#endif // not define SEGGER_SYSTEM_VIEW\n", True)
+
+    write_custom(file, t_endif_header_file, True)
+
+def generate_header_file(path_header_file):
     """Create C header file for SystemView with define NamedType and define API Functions"""
 
     if path_header_file == None:
         raise Exception('Missing argument "--path-header" to generate header file')
     filename = "SEGGER_SYSVIEW_Conf.g.h"
     path = os.path.join(path_header_file, filename)
-    with open(path, 'w') as file:
-        print(f"{color.OKGREEN}Create file:{color.ENDC} '{path}' for C header SysView description")
-        file.write(t_header_header_file.format(file=__file__, filename=filename))
-        file.write(t_ifndef_header_file)
-
-        file.write(t_named_type_header_file)
-        for named_type in NamedType.named_types:
-            file.write(f'\n// NamedType {named_type.type_name}\n')
-            line = named_type.header_define()
-            file.write(line)
-        file.write('\n')
-
-        file.write(t_functions_header_file)
-        for function in Function.functions:
-            line = function.header_define_id()
-            file.write(line)
-        file.write('\n')
-
-        file.write(t_macro_functions_header_file)
-        for function in Function.functions:
-            line = function.header_macro_function()
-            file.write(line)
-
-        file.write(t_endif_header_file)
+    print(f"{color.OKGREEN}Create file:{color.ENDC} '{path}' for C header SysView description")
+    if dry_run:
+        write_header_file(None, filename)
+    else:
+        with open(path, 'w') as file:
+            write_header_file(file, filename)
     print(f"{color.OKGREEN}SUCCESS to generate file{color.ENDC} '{filename}'")
 
 def get_path_os_file_description(args_path_os):
@@ -392,18 +448,29 @@ def get_path_os_file_description(args_path_os):
 
 def main(args):
     print(f"{color.OKCYAN}Start SystemView file generation{color.ENDC}")
+    if verbose:
+        print("Verbose mode: On")
+    if dry_run:
+        print("Dry-Run mode: On")
     try:
         path_os_file_description = get_path_os_file_description(args.path_OS)
         print(f"{color.OKGREEN}Path to SystemView: '{path_os_file_description}'{color.ENDC}")
         dict_json_data = open_json_file(args.json_files)
         NamedType.parse_namedType(dict_json_data)
         Function.parse_function(dict_json_data)
-        write_os_file_description(path_os_file_description, args.Os_name)
-        write_header_file(args.path_header)
+        generate_os_file_description(path_os_file_description, args.Os_name)
+        generate_header_file(args.path_header)
         print(f"{color.OKCYAN}End SystemView file generation{color.ENDC}")
     except Exception as error:
         print_fail(error)
         print(f"{color.FAIL}Fail to generate files{color.ENDC}")
+
+# -------------------- Global Variables --------------------
+
+verbose = False
+dry_run = False
+
+# -------------------- CLI command --------------------
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=f"usage: example: python {os.path.basename(__file__)} nxgCourt --json-files sysview.json sysview1.json sysview2.json --path-header .\src\SystemView"\
@@ -414,7 +481,11 @@ if __name__ == "__main__":
     parser.add_argument("-pH", "--path-header", required=True, help="Path to create the header file with the definitions of all the events.")
     # Optional Arguments
     parser.add_argument("-pO", "--path-OS", help="Path to the SystemView folder e.g. 'C:\Program Files\SEGGER\SystemView\\', if not specify use SYSVIEW_PATH env variable.")
+    parser.add_argument("-d", "--dry-run", action="store_true", help="Test program without actually executing it.")
+    parser.add_argument("-v", "--verbose", action="store_true", help="increase output verbosity")
     
     args = parser.parse_args()
+    verbose = args.verbose
+    dry_run = args.dry_run
     main(args)
     
