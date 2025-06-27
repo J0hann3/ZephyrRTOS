@@ -35,7 +35,7 @@ t_header_header_file = """/*\n\
 * Purpose : SEGGER SystemView configuration file.\n\
 * \n\
 * In the file Config/SEGGER_SYSVIEW_Conf.h add the following:\n\
-*   #include {filename}\n\
+*   #include "{filename}"\n\
 * \n\
 * To record an event, use the following function:\n\
 * #include <SEGGER_SYSVIEW.h>\n\
@@ -58,6 +58,10 @@ t_named_type_header_file = """//
 
 t_functions_header_file = """//
 // Define Sysview function ID to record events.
+//\n"""
+
+t_macro_functions_header_file = """//
+// Define Sysview macro functions to record events.
 //\n"""
 
 t_endif_header_file = """\n#endif  // SEGGER_SYSVIEW_CONF_G_H\n"""
@@ -184,13 +188,112 @@ class Function:
         str += '\n'
         return str
     
-    def header_define(self):
+    def get_arguments_type(self, str):
+        res_int = 0
+        res_str = 0
+        valid_int_modifiers = "bBdDIptux"
+        valid_str_modifiers = "s"
+        for i, char in enumerate(str):
+            if char == '%':
+                if i + 1 >= len(str):
+                    raise Exception(f"Invalid format for description: '{str}' in function: '{self.function_name}'")
+                
+                len_match = 0
+                for named_type in NamedType.named_types:
+                    if str.startswith(named_type.type_name, i + 1):
+                        if len_match < len(named_type.type_name):
+                            len_match = len(named_type.type_name)
+                if len_match != 0:
+                    res_int += 1
+                    i += len_match
+                    continue
+                if str[i + 1] in valid_int_modifiers:
+                    res_int += 1
+                elif str[i + 1] in valid_str_modifiers:
+                    res_str += 1
+                else:
+                    raise Exception(f"Invalid format for description: '{str}' in function: '{self.function_name}'")
+        return res_int, res_str
+
+    def get_function_record(self, nb_int:int , nb_str: int, enter_function: bool):
+        if not enter_function:
+            if nb_int == 0 and nb_str == 0:
+                return "SEGGER_SYSVIEW_RecordEndCall"
+            if nb_int == 1 and nb_str == 0:
+                return "SEGGER_SYSVIEW_RecordEndCallU32"
+            else:
+                raise Exception(f"Invalid number of paramter in format return description: '{self.ReturnValueDescription}' of '{self.function_name}'")
+        if nb_int == 0 and nb_str == 0:
+            return "SEGGER_SYSVIEW_RecordVoid"
+        if nb_int == 0 and nb_str == 1:
+            return "SEGGER_SYSVIEW_RecordString"
+        if nb_str >= 1:
+            raise Exception(f"Invalid number of string in format description: '{self.ParameterDescription}' in '{self.function_name}'")
+        match nb_int:
+            case 1:
+                return "SEGGER_SYSVIEW_RecordU32"
+            case 2:
+                return "SEGGER_SYSVIEW_RecordU32x2"
+            case 3:
+                return "SEGGER_SYSVIEW_RecordU32x3"
+            case 4:
+                return "SEGGER_SYSVIEW_RecordU32x4"
+            case 5:
+                return "SEGGER_SYSVIEW_RecordU32x5"
+            case 6:
+                return "SEGGER_SYSVIEW_RecordU32x6"
+            case 7:
+                return "SEGGER_SYSVIEW_RecordU32x7"
+            case 8:
+                return "SEGGER_SYSVIEW_RecordU32x8"
+            case 9:
+                return "SEGGER_SYSVIEW_RecordU32x9"
+            case 10:
+                return "SEGGER_SYSVIEW_RecordU32x10"
+            case _:
+                raise Exception(f"Invalid number of argument in format description: '{self.ParameterDescription}' in '{self.function_name}'")
+
+    def get_str_arg_list(self, nb_int:int, nb_str:int):
+        str = ""
+        for i in range(nb_int):
+            str += f'int{i}, '
+        for i in range(nb_str):
+            str += f'str{i}, '
+        if len(str) != 0:
+            str = str[:-2]
+        return str
+    
+    def header_define_id(self):
         str = f'#define ID_SYSVIEW_{self.function_name.upper()} {self.index}       //'
         if hasattr(self, 'ParameterDescription'):
             str += f'{self.ParameterDescription}'
         if hasattr(self, 'ReturnValueDescription'):
             str += f' | {self.ReturnValueDescription}'
         str += '\n'
+        return str
+    
+    def header_macro_function(self):
+        str = f'#define record_sysview_{self.function_name}'
+        if hasattr(self, 'ReturnValueDescription'):
+            str += '_enter'
+        if hasattr(self, 'ParameterDescription'):
+            nb_int, nb_str = self.get_arguments_type(self.ParameterDescription)
+            function_name = self.get_function_record(nb_int, nb_str, True)
+            args = '(' + self.get_str_arg_list(nb_int, nb_str) + ')'
+            str +=  args + ' '
+            str += function_name + args
+            str += f"       // SystenView function: '{self.function_name}', description: '{self.ParameterDescription}'\n"
+        else:
+            str += f"() SEGGER_SYSVIEW_RecordVoid()     //SystenView function: '{self.function_name}', no description\n"
+
+        if hasattr(self, 'ReturnValueDescription'):
+            str += f'#define record_sysview_{self.function_name}_exit'
+            nb_int, nb_str = self.get_arguments_type(self.ReturnValueDescription)
+            function_name = self.get_function_record(nb_int, nb_str, False)
+            args = '(' + self.get_str_arg_list(nb_int, nb_str) + ')'
+            str +=  args + ' '
+            str += function_name + args
+            str += f"       // SystenView function: '{self.function_name}', return description: '{self.ReturnValueDescription}'\n"
         return str
     
     def parse_function(dict_json_data):
@@ -260,7 +363,13 @@ def write_header_file(path_header_file):
 
         file.write(t_functions_header_file)
         for function in Function.functions:
-            line = function.header_define()
+            line = function.header_define_id()
+            file.write(line)
+        file.write('\n')
+
+        file.write(t_macro_functions_header_file)
+        for function in Function.functions:
+            line = function.header_macro_function()
             file.write(line)
 
         file.write(t_endif_header_file)
