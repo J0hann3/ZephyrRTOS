@@ -71,12 +71,14 @@ bool SYS_Tasks(APP_ACCESS access)
 	#ifdef DEBUG
 	  printf("Card not detected\n");
   #endif
-    SEGGER_SYSVIEW_RecordU32(ID_SYSVIEW_E_SD_CARD_DETECTED, 0);
+    record_sysview_sd_card_detected(TYPE_SYSVIEW_BOOL_FALSE);
+    // SEGGER_SYSVIEW_RecordU32(ID_SYSVIEW_E_SD_CARD_DETECTED, 0);
     SEGGER_SYSVIEW_Warn("No card detected\n");
   }
   else
   {
-    SEGGER_SYSVIEW_RecordU32(ID_SYSVIEW_E_SD_CARD_DETECTED, 1);
+    record_sysview_sd_card_detected(TYPE_SYSVIEW_BOOL_TRUE);
+    // SEGGER_SYSVIEW_RecordU32(ID_SYSVIEW_E_SD_CARD_DETECTED, 1);
 
     /* try to write until success (APP_IDLE) or error (APP_ERROR). */
     while (get_sd_app_state() < APP_IDLE)
@@ -147,7 +149,8 @@ void APP_Tasks(void)
     appData.state = APP_MOUNT_DISK;
     break;
   case APP_MOUNT_DISK :
-    SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_E_MOUNT_SD_CARD);
+    record_sysview_mount_sd_card();
+    // SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_E_MOUNT_SD_CARD);
     if (SYS_FS_Mount(SDCARD_DEV_NAME, SDCARD_MOUNT_NAME, FAT, 0, NULL) != 0)
     {
       /* The disk could not be mounted. Try
@@ -182,7 +185,8 @@ void APP_Tasks(void)
     break;
 
   case APP_OPEN_FIRST_FILE :
-    SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_E_OPEN_SD_CARD);
+    record_sysview_open_sd_card_enter();
+    // SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_E_OPEN_SD_CARD);
 
     appData.fileHandle = SYS_FS_FileOpen(currentfilename, (SYS_FS_FILE_OPEN_APPEND));
 
@@ -222,7 +226,8 @@ void APP_Tasks(void)
 
   case APP_WRITE_TO_FILE : ;
     /* Product CSV line */
-    SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_E_WRITE_SD_CARD);
+    record_sysview_write_sd_card();
+    // SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_E_WRITE_SD_CARD);
 
     // Read FIFO and write to SD until measures_FIFO is empty
     uint16_t ml_size = measures_logger_get_size();
@@ -273,7 +278,8 @@ void APP_Tasks(void)
     }
     break;
   case APP_CLOSE_FILE :
-    SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_E_CLOSE_SD_CARD);
+    record_sysview_close_sd_card();
+    // SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_E_CLOSE_SD_CARD);
 
     SYS_FS_FileClose(appData.fileHandle);
 
@@ -282,7 +288,8 @@ void APP_Tasks(void)
     break;
 
   case APP_UNMOUNT_DISK :
-    SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_E_UNMOUNT_SD_CARD);
+    record_sysview_unmount_sd_card();
+    // SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_E_UNMOUNT_SD_CARD);
 
     if (SYS_FS_Unmount(SDCARD_MOUNT_NAME) != 0)
     {
@@ -348,7 +355,8 @@ void       set_sd_app_state(APP_STATES status) { appData.state = status; }
 
 void sd_card_go_to_sleep()
 {
-  SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_E_SLEEP_SD_CARD);
+  record_sysview_sleep_sd_card();
+  // SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_E_SLEEP_SD_CARD);
   SpiDeInit();
 
   // Set pin direction SD card ChipSelect
@@ -359,7 +367,8 @@ void sd_card_go_to_sleep()
 
 void sd_card_wake_from_sleep(void)
 {
-  SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_E_WAKE_UP_SD_CARD);
+  record_sysview_wake_up_sd_card();
+  // SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_E_WAKE_UP_SD_CARD);
   SpiInit();
 
   // Set pin direction SD card ChipSelect

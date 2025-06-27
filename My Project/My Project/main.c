@@ -100,8 +100,7 @@ int main(void)
 	// SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_NO_BLOCK_SKIP);
 	// SEGGER_RTT_WriteString(0, RTT_CTRL_TEXT_BRIGHT_YELLOW"Welcome here\n"RTT_CTRL_RESET);
 	SEGGER_SYSVIEW_Conf();
-	// SEGGER_SYSVIEW_Start();
-	SEGGER_SYSVIEW_OnTaskStartExec(MAIN_TASK);
+	SEGGER_SYSVIEW_Start();
 	
 	while (1)
 	{
