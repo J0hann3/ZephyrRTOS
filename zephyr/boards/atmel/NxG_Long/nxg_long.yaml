@@ -1,0 +1,21 @@
+identifier: nxg_long
+name: NxG Long
+type: mcu
+arch: arm
+toolchain:
+  - zephyr
+  - gnuarmemb
+flash: 256
+ram: 32
+supported:
+  - counter
+  - dma
+  - gpio
+  - i2c
+  - pwm
+  - rtc
+  - spi
+  - uart
+  - usb_device
+  - watchdog
+vendor: atmel

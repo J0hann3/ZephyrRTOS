@@ -1,0 +1,6 @@
+board:
+  name: nxg_long
+  full_name: NxG Long
+  vendor: atmel
+  socs:
+    - name: samd21j18a

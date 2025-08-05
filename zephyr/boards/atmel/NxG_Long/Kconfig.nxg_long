@@ -1,0 +1,2 @@
+config BOARD_NXG_LONG
+	select SOC_SAMD21J18A
