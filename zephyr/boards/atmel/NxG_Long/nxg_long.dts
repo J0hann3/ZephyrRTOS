@@ -176,12 +176,16 @@
 			#size-cells = < 0x1 >;
 			slot1_partition: partition@0 {
 				label = "image-1";
-				reg = < 0x0 DT_SIZE_K(160) >;
+				reg = < 0x0 DT_SIZE_K(220) >;
 			};
-			scratch_partition: partition@28000 {
+			scratch_partition: partition@37000 {
 				label = "image-scratch";
-				reg = < 0x28000 DT_SIZE_K(64) >;
+				reg = < 0x37000 DT_SIZE_K(64) >;
 			};
+			storage_partition: partition@47000 {
+			label = "storage";
+			reg = <0x47000 DT_SIZE_K(64)>;
+		};
 		};
 	};
 
@@ -225,16 +229,12 @@ zephyr_udc0: &usb0 {
 		#size-cells = < 0x1 >;
 		boot_partition: partition@0 {
 			label = "mcuboot";
-			reg = < 0x0 DT_SIZE_K(36) >;
+			reg = < 0x0 DT_SIZE_K(32) >;
 			read-only;
 		};
-		slot0_partition: partition@9000 {
+		slot0_partition: partition@8000 {
 			label = "image-0";
-			reg = < 0x9000 DT_SIZE_K(160) >;
-		};
-		storage_partition: partition@31000 {
-			label = "storage";
-			reg = <0x31000 DT_SIZE_K(4)>;
+			reg = < 0x8000 DT_SIZE_K(220) >;
 		};
 	};
 };
