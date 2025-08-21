@@ -60,6 +60,18 @@
 	},
 	"tasks": {
 		"version": "2.0.0",
+		"windows": {
+			"options": {
+				"shell": {
+					"executable": "cmd.exe",
+					"args": [
+						"/C",
+						"${userHome}/zephyrproject1/.venv/Scripts/activate.bat",
+						"&"
+					]
+				}
+			}
+		},
 		"tasks": [
 			{
 				"label": "West Build",
@@ -98,8 +110,9 @@
 					"-p",
 					"${input:pristine}",
 					"-b",
-					"${input:board}",
-					"${input:path}"
+					{"value": "${input:board}", "quoting": "weak"},
+					"${input:sysbuild}",
+					{"value": "${input:path}", "quoting": "weak"}
 				],
 				"options": {
 					"env": {
@@ -150,6 +163,16 @@
 				"type": "promptString",
 				"default": "custom_board",
 				"description": "Choose the directory to build"
+			},
+			{
+				"id": "sysbuild",
+				"type": "pickString",
+				"default": "",
+				"options": [
+					"",
+					"--sysbuild"
+				],
+				"description": "Choose if build with McuBootloader"
 			}
 		]
 	},
@@ -188,7 +211,9 @@
 				"deviceName": "ATSAMD21G18A",
 				"device": "ATSAMD21G18A",
 				"cwd": "${workspaceFolder:zephyr}",
-				"executable": "build\\zephyr\\zephyr.elf",
+				"executable": "build\\fuota\\zephyr\\zephyr.elf",
+				"loadFiles": ["build\\fuota\\zephyr\\zephyr.elf", "build\\mcuboot\\zephyr\\zephyr.elf"],
+				"symbolFiles": ["build\\fuota\\zephyr\\zephyr.elf", "build\\mcuboot\\zephyr\\zephyr.elf"],
 				"request": "launch",
 				"type": "cortex-debug",
 				"runToEntryPoint": "main",
@@ -202,7 +227,9 @@
 				"deviceName": "ATSAMD21G18A",
 				"device": "ATSAMD21G18A",
 				"cwd": "${workspaceFolder:zephyr}",
-				"executable": "build\\zephyr\\zephyr.elf",
+				"executable": "build\\fuota\\zephyr\\zephyr.elf",
+				"loadFiles": ["build\\fuota\\zephyr\\zephyr.elf", "build\\mcuboot\\zephyr\\zephyr.elf"],
+				"symbolFiles": ["build\\fuota\\zephyr\\zephyr.elf", "build\\mcuboot\\zephyr\\zephyr.elf"],
 				"request": "attach",
 				"type": "cortex-debug",
 				"runToEntryPoint": "main",
@@ -242,9 +269,10 @@
 	"extensions": {
 		"recommendations": [
 			"ms-vscode.cpptools-extension-pack",
-			"ms-vscode.vscode-embedded-tools",
+			"ms-vscode.cmake-tools",
 			"ms-vscode.vscode-serial-monitor",
 			"marus25.cortex-debug",
+			"nordic-semiconductor.nrf-devicetree",
 		]
 	}
 }
