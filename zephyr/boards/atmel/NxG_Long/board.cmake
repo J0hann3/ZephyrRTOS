@@ -1,5 +1,5 @@
-board_set_debugger_ifnset(jlink)
-board_set_flasher_ifnset(jlink)
+board_set_debugger_ifnset(openocd)
+board_set_flasher_ifnset(openocd)
 
 board_runner_args(jlink "--device=ATSAMD21J18A")
 

@@ -183,9 +183,9 @@
 				reg = < 0x37000 DT_SIZE_K(64) >;
 			};
 			storage_partition: partition@47000 {
-			label = "storage";
-			reg = <0x47000 DT_SIZE_K(64)>;
-		};
+				label = "storage";
+				reg = <0x47000 DT_SIZE_K(8)>;
+			};
 		};
 	};
 
