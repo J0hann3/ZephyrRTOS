@@ -189,7 +189,7 @@
     <com_atmel_avrdbg_tool_atmelice>
       <ToolOptions>
         <InterfaceProperties>
-          <SwdClock>0</SwdClock>
+          <SwdClock>2000000</SwdClock>
         </InterfaceProperties>
         <InterfaceName>SWD</InterfaceName>
       </ToolOptions>
@@ -1071,22 +1071,22 @@
     <Compile Include="SystemView\SEGGER\SEGGER_SYSVIEW_ConfDefaults.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="SystemView\SEGGER\SEGGER_SYSVIEW_Config_NoOS_CM0.c">
+    <Compile Include="SystemView\SEGGER\SEGGER_SYSVIEW_Int.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="SystemView\SEGGER\SEGGER_SYSVIEW_Int.h">
+    <Compile Include="SystemView\SEGGER\SEGGER_SYSVIEW_NoOS_CM0.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="SystemView\SEGGER\Syscalls\SEGGER_RTT_Syscalls_GCC.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="SystemView\SEGGER\Syscalls\SEGGER_RTT_Syscalls_IAR.c">
+    <Compile Include="SystemView\sysview.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="SystemView\SEGGER\Syscalls\SEGGER_RTT_Syscalls_KEIL.c">
+    <Compile Include="SystemView\sysview.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="SystemView\SEGGER\Syscalls\SEGGER_RTT_Syscalls_SES.c">
+    <Compile Include="SystemView\timestamp.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="temp_hum_sensor.c">
