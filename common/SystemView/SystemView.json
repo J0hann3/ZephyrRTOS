@@ -1,0 +1,24 @@
+{
+    "NamedType": [
+        {"TypeName" : "B", "Fields" :[{"Key" : "0", "Value" : "false"}, {"Key" : "1", "Value" : "true"}]},
+        {"TypeName" : "Bool", "Fields" :[{"Key" : "0", "Value" : "false"}, {"Key" : "1", "Value" : "true"}]},
+        {"TypeName" : "Bo", "Fields" :[{"Key" : "0", "Value" : "false"}, {"Key" : "1", "Value" : "true"}]},
+        {"TypeName" : "Boo", "Fields" :[{"Key" : "0", "Value" : "false"}, {"Key" : "1", "Value" : "true"}]}
+    ],
+    "Function" : 
+    [
+        {"FunctionName" : "sycall", "ParameterDescription" : "FunctionName=%Bol"},
+        {"FunctionName" : "delay_ms", "ParameterDescription" : "msec=%s ms", "ReturnValueDescription" : "Returns %u"},
+        {"FunctionName" : "config_light_sensor", "ParameterDescription" : "config= %u, %u, %u", "ReturnValueDescription" : "Returns %u"},
+        {"FunctionName" : "measure_light", "ParameterDescription" : "Start measure", "ReturnValueDescription" : "Returns %u"},
+        {"FunctionName" : "measure_temp", "ParameterDescription" : "Start measure", "ReturnValueDescription" : "Returns %u"},
+        {"FunctionName" : "sd_card_detected", "ParameterDescription" : "isDetected=%Bool"},
+        {"FunctionName" : "open_sd_card", "ReturnValueDescription" : "Returns %u"},
+        {"FunctionName" : "close_sd_card"},
+        {"FunctionName" : "mount_sd_card"},
+        {"FunctionName" : "unmount_sd_card"},
+        {"FunctionName" : "sleep_sd_card"},
+        {"FunctionName" : "wake_up_sd_card"},
+        {"FunctionName" : "write_sd_card"}
+    ]
+}

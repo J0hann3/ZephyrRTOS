@@ -12,8 +12,9 @@
 #include <hal_init.h>
 #include <hpl_gclk_base.h>
 #include <hpl_pm_base.h>
-
-struct timer_descriptor      TIMER_0;
+#include "timestamp.h"
+#include "calendar.h"
+#include "tools.h"
 
 struct usart_sync_descriptor USART_0;
 
@@ -85,18 +86,6 @@ void delay_driver_init(void)
 	delay_init(SysTick);
 }
 
-/**
- * \brief Timer initialization function
- *
- * Enables Timer peripheral, clocks and initializes Timer driver
- */
-static void TIMER_0_init(void)
-{
-	_pm_enable_bus_clock(PM_BUS_APBC, TC4);
-	_gclk_enable_channel(TC4_GCLK_ID, CONF_GCLK_TC4_SRC);
-
-	timer_init(&TIMER_0, TC4, _tc_get_timer());
-}
 
 void system_init(void)
 {
@@ -116,5 +105,7 @@ void system_init(void)
 
 	CALENDAR_0_init();
 
+#ifdef SEGGER_SYSTEM_VIEW
 	TIMER_0_init();
+#endif
 }
