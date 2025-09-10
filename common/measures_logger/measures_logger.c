@@ -86,31 +86,34 @@ bool measures_logger_read(measure_t *last_measure)
  *  Summary:
  *    Write new_measure to m_stack at head index.
  */
-bool measures_logger_write(const measure_t *new_measure)
+void measures_logger_write(const measure_t *new_measure)
 {
+  if (new_measure->LUM_SENSOR_EN && new_measure->brightness == UINT16_MAX
+    || new_measure->TEMP_HUM_SENSOR_EN && (new_measure->humidity == UINT16_MAX || new_measure->humidity == UINT16_MAX))
+    return ;
   if (m_stack.size == 0)
   {
 	  m_stack.errorValue = MEASURES_LOGGER_UNINITIALIZED;
-	  return MEASURES_LOGGER_RES_FAILURE;
+	  return ;
   }
   if (new_measure == NULL)
   {
     m_stack.errorValue = MEASURES_LOGGER_INVALID_PARAMETER;
-    return MEASURES_LOGGER_RES_FAILURE;
+    return ;
   }
 
   if (m_stack.counter != 0 && ((m_stack.head) % m_stack.size) == m_stack.tail)
   {
     /*Don't write on unread measure*/
     m_stack.errorValue = MEASURES_LOGGER_UNREADED_MEASURES;
-    return MEASURES_LOGGER_RES_FAILURE;
+    return ;
   }
 
   m_stack.measure[m_stack.head] = *new_measure;
   m_stack.head                  = (m_stack.head + 1) % m_stack.size;
   m_stack.counter               = m_stack.counter + 1;
   m_stack.errorValue            = MEASURES_LOGGER_ERROR_OK;
-  return MEASURES_LOGGER_RES_SUCCESS;
+  return ;
 }
 
 /*

@@ -87,7 +87,10 @@ int main(void)
 {
 	temp_measure i2c_temp = {0};
 	light_measure i2c_light = {0};
-	measure_t current_measure = {.TEMP_HUM_SENSOR_EN = 1,
+	measure_t current_measure = {.brightness = UINT16_MAX,
+								.humidity = UINT16_MAX,
+								.humidity = UINT16_MAX,
+								.TEMP_HUM_SENSOR_EN = 1,
 								.LUM_SENSOR_EN = 1};
 							
 	system_init();
@@ -132,12 +135,12 @@ int main(void)
 
 	// while (1)
 	// {
-	// 	if (current_measure.LUM_SENSOR_EN && init_and_read_lum_sensor(i2c_lum,
-	// 				&current_measure.brightness) == 1 )
-	// 		return 1;
-	// 	if (current_measure.TEMP_HUM_SENSOR_EN && read_temp_sensor(i2c_temp, &current_measure.temperature,
-	// 				&current_measure.humidity) == 1 )
-	// 		return 1;
+		// if (current_measure.LUM_SENSOR_EN && init_and_read_lum_sensor(i2c_lum,
+		// 			&current_measure.brightness) == 1 )
+		// 	return 1;
+		// if (current_measure.TEMP_HUM_SENSOR_EN && read_temp_sensor(i2c_temp, &current_measure.temperature,
+		// 			&current_measure.humidity) == 1 )
+		// 	return 1;
 	// 	measures_logger_write(&current_measure);
 	// 	size_t count = measures_logger_count();
 	// 	uint16_t size = measures_logger_get_size();

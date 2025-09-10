@@ -20,7 +20,7 @@ void SYSVIEW_init()
     DEBUG_SEGGER_SYSVIEW_Conf();  /* Configure and initialize SystemView  */
     DEBUG_SEGGER_SYSVIEW_Start(); /* Starts SystemView recording*/
     DEBUG_SYSVIEW_AddTask(main, "main", 10);
-    DEBUG_SYSVIEW_AddTask(delay_ms, "delay", 10);
     DEBUG_SEGGER_SYSVIEW_OnTaskStartExec((U32) main);
     DEBUG_SYSVIEW_AddDataRegister(TEMP_ID, "temperature", SEGGER_SYSVIEW_TYPE_U32, "°C");
+    DEBUG_SYSVIEW_AddDataRegister(HUM_ID, "humidity", SEGGER_SYSVIEW_TYPE_U32, "%");
 }

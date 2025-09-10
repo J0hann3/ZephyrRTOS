@@ -4,8 +4,7 @@
 #include <hpl_tc_base.h>
 #include <hpl_time_measure.h>
 #include <peripheral_clk_config.h>
-
-#include "SEGGER_SYSVIEW.h"
+#include "timestamp.h"
 
 struct timer_descriptor      TIMER_0;
 
@@ -64,7 +63,12 @@ void start_timestamp()
  * Return value
  *   The current timestamp.
  */
-U32 SEGGER_SYSVIEW_X_GetTimestamp(void) {
+U32 SEGGER_SYSVIEW_X_GetTimestamp(void)
+{
+  return get_timestamp();
+}
+
+U32 get_timestamp(void) {
   static U32 OldTickCount = 0;
   static U32 OldCycles = 0;
   U32 Cycles;
@@ -95,4 +99,23 @@ U32 SEGGER_SYSVIEW_X_GetTimestamp(void) {
   OldCycles = Cycles;
 
   return Cycles + TickCount * CyclesPerTick;
+}
+
+bool is_delay_reach(uint32_t delay_ms, uint32_t start_time)
+{
+  uint32_t current_time;
+	
+	current_time = get_timestamp();
+  delay_ms = (delay_ms * 1000) / 30.517;
+
+  if (start_time < start_time + delay_ms)
+  {
+    return start_time + delay_ms <= current_time;
+  }
+  else
+  {
+    if (current_time < start_time)
+      return start_time + delay_ms <= current_time;
+  }
+  return false;
 }
