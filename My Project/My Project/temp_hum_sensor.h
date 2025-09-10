@@ -13,6 +13,8 @@ typedef struct s_temp_measure
 
     uint16_t temp;
     uint16_t hum;
+
+    uint32_t time_start_measure;
 } temp_measure;
 
 // uint8_t read_temp_sensor(temp_measure *);

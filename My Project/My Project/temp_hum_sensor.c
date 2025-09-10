@@ -1,7 +1,10 @@
 #include "temp_hum_sensor.h"
 #include "i2c.h"
 #include "work_queue.h"
+#include "timestamp.h"
 #include <SEGGER_SYSVIEW.h>
+
+#define DELAY_TEMP_SENSOR 10 //ms
 
 void temp_sensor_read_value(void *const temp_hum);
 
@@ -30,17 +33,22 @@ void temp_sensor_write_command(void *const arg)
 		record_sysview_measure_temp_exit(1);
 		return;
 	}
+	temp_hum->time_start_measure = get_timestamp();
 	wq_enqueue(temp_sensor_read_value, temp_hum);
 }
 
 void temp_sensor_read_value(void *const arg)
 {
-	// add delay
-	delay_ms(10);
 	temp_measure *temp_hum = arg;
 	uint8_t reading[6]= {0};
 	uint32_t u32_temp;
 	uint32_t u32_hum;
+	
+	if (!is_delay_reach(DELAY_TEMP_SENSOR, temp_hum->time_start_measure))
+	{
+		wq_enqueue(temp_sensor_read_value, arg);
+		return;
+	}
 
 	uint8_t check = io_read(temp_hum->i2c_device, reading, 6);
 	set_i2c_is_busy(false);

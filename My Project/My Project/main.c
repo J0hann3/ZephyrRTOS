@@ -85,8 +85,8 @@ void BoardInitPeriph(void)
 
 int main(void)
 {
-	struct io_descriptor *i2c_lum = {0};
 	temp_measure i2c_temp = {0};
+	light_measure i2c_light = {0};
 	measure_t current_measure = {.TEMP_HUM_SENSOR_EN = 1,
 								.LUM_SENSOR_EN = 1};
 							
@@ -101,15 +101,21 @@ int main(void)
 	SYSVIEW_init();
 	
 	wq_init();
-	// if (current_measure.LUM_SENSOR_EN)
-	// {
-	// 	wq_enqueue();
-
-	// }
-	if (current_measure.TEMP_HUM_SENSOR_EN)
+	DEBUG_SYSVIEW_AddTask(temp_sensor_write_command, "temp_sensor_write_command", 0);
+	DEBUG_SYSVIEW_AddTask(temp_sensor_read_value, "temp_sensor_read_value", 0);
+	DEBUG_SYSVIEW_AddTask(turn_on_light_sensor, "turn_on_light_sensor", 0);
+	DEBUG_SYSVIEW_AddTask(turn_off_light_sensor, "turn_off_light_sensor", 0);
+	DEBUG_SYSVIEW_AddTask(light_sensor_write_command, "light_sensor_write_command", 0);
+	DEBUG_SYSVIEW_AddTask(read_lum_sensor, "read_lum_sensor", 0);
+	
+	if (current_measure.LUM_SENSOR_EN)
 	{
-		wq_enqueue(temp_sensor_write_command, (void *)&i2c_temp);
+		wq_enqueue(turn_on_light_sensor, &i2c_light);
 	}
+	// if (current_measure.TEMP_HUM_SENSOR_EN)
+	// {
+	// 	wq_enqueue(temp_sensor_write_command, (void *)&i2c_temp);
+	// }
 	// wq_enqueue(measures_logger_write);
 	// wq_enqueue(SYS_Tasks);
 
@@ -120,7 +126,8 @@ int main(void)
 			_go_to_sleep();
 		if (get_wake_up_calendar())
 		{
-			wq_enqueue(temp_sensor_write_command, (void *)&i2c_temp);
+			wq_enqueue(turn_on_light_sensor, &i2c_light);
+			// wq_enqueue(temp_sensor_write_command, (void *)&i2c_temp);
 			clear_wake_up_calendar();
 		}
 	}
