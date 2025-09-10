@@ -74,11 +74,11 @@ void read_lum_sensor(void *const arg)
 		record_sysview_measure_light_exit(1);
 		return ;
 	}
-	light->light = ((uint16_t)data_read[1] << 8) + data_read[0];
-	light->light = (uint32_t) (light->light) * 82/100;
-	DEBUG_SEGGER_SYSVIEW_PrintfHost("Light sensor: %d", light->light);
+	*light->light = ((uint16_t)data_read[1] << 8) + data_read[0];
+	*light->light = (uint32_t) (*light->light) * 82/100;
+	DEBUG_SEGGER_SYSVIEW_PrintfHost("Light sensor: %d", *light->light);
 #ifdef DEBUG
-	printf("Light sensor: %d\n", light->light);
+	printf("Light sensor: %d\n", *light->light);
 #endif
 	record_sysview_measure_light_exit(0);
 	wq_enqueue(turn_off_light_sensor, NULL);

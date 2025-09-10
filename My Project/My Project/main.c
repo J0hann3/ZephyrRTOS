@@ -4,7 +4,6 @@
 #include "sd_card_driver/definitions.h"
 #include "tools.h"
 #include "calendar.h"
-#include "SEGGER_RTT.h"
 #include "SEGGER_SYSVIEW_Conf.h"
 #include "SEGGER_SYSVIEW.h"
 #include "work_queue.h"
@@ -85,13 +84,14 @@ void BoardInitPeriph(void)
 
 int main(void)
 {
-	temp_measure i2c_temp = {0};
-	light_measure i2c_light = {0};
 	measure_t current_measure = {.brightness = UINT16_MAX,
-								.humidity = UINT16_MAX,
-								.humidity = UINT16_MAX,
-								.TEMP_HUM_SENSOR_EN = 1,
-								.LUM_SENSOR_EN = 1};
+							.humidity = UINT16_MAX,
+							.temperature = UINT16_MAX,
+							.TEMP_HUM_SENSOR_EN = 1,
+							.LUM_SENSOR_EN = 1};
+	light_measure i2c_light = {.light = &current_measure.brightness};
+	temp_measure i2c_temp = {.hum = &current_measure.humidity,
+							.temp = &current_measure.temperature};
 							
 	system_init();
 	BoardInitPeriph();
@@ -110,12 +110,13 @@ int main(void)
 	DEBUG_SYSVIEW_AddTask(turn_off_light_sensor, "turn_off_light_sensor", 0);
 	DEBUG_SYSVIEW_AddTask(light_sensor_write_command, "light_sensor_write_command", 0);
 	DEBUG_SYSVIEW_AddTask(read_lum_sensor, "read_lum_sensor", 0);
+	DEBUG_SYSVIEW_AddTask(measures_logger_write, "measures_logger_write", 0);
 
 	if (current_measure.LUM_SENSOR_EN)
 		wq_enqueue(turn_on_light_sensor, (void *)&i2c_light);
 	if (current_measure.TEMP_HUM_SENSOR_EN)
 		wq_enqueue(temp_sensor_write_command, (void *)&i2c_temp);
-	// wq_enqueue(measures_logger_write);
+	wq_enqueue(measures_logger_write, (void *)&current_measure);
 	// wq_enqueue(SYS_Tasks);
 
 	while (1)
@@ -129,6 +130,7 @@ int main(void)
 				wq_enqueue(turn_on_light_sensor, (void *)&i2c_light);
 			if (current_measure.TEMP_HUM_SENSOR_EN)
 				wq_enqueue(temp_sensor_write_command, (void *)&i2c_temp);
+			wq_enqueue(measures_logger_write, (void *)&current_measure);
 			clear_wake_up_calendar();
 		}
 	}

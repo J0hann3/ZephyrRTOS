@@ -56,31 +56,31 @@ void temp_sensor_read_value(void *const arg)
 	}
 
 	//Add 100�C to temp and temp multiple by 10 to keep float precision
-	temp_hum->temp = (reading[0] << 8) + reading[1];
-	u32_temp = (uint32_t)((temp_hum->temp * 267 / 10000) + 1000);
+	*temp_hum->temp = (reading[0] << 8) + reading[1];
+	u32_temp = (uint32_t)((*temp_hum->temp * 267 / 10000) + 1000);
 	u32_temp = u32_temp - 450;
-	temp_hum->temp = (uint16_t)u32_temp;
+	*temp_hum->temp = (uint16_t)u32_temp;
 
 	//Humidity multiple by 10 to keep float precision
-	temp_hum->hum = (reading[3] << 8) + reading[4];
-	u32_hum = ((uint32_t)(temp_hum->hum * 1907) - 6000000) / 100000;
-	temp_hum->hum = (uint16_t)u32_hum;
+	*temp_hum->hum = (reading[3] << 8) + reading[4];
+	u32_hum = ((uint32_t)(*temp_hum->hum * 1907) - 6000000) / 100000;
+	*temp_hum->hum = (uint16_t)u32_hum;
 
-	DEBUG_SEGGER_SYSVIEW_PrintfHost("Temperature: %u, Humidity %u\n", (temp_hum->temp - 1000) / 10, temp_hum->hum/ 10);
+	DEBUG_SEGGER_SYSVIEW_PrintfHost("Temperature: %u, Humidity %u\n", (*temp_hum->temp - 1000) / 10, *temp_hum->hum/ 10);
 
 	SEGGER_SYSVIEW_DATA_SAMPLE TempPlot;
-	U32 temp = (temp_hum->temp - 1000);
+	U32 temp = (*temp_hum->temp - 1000);
 	TempPlot.ID = TEMP_ID;
 	TempPlot.pValue.pU32 = &temp;
 	DEBUG_SEGGER_SYSVIEW_SampleData(&TempPlot);
 
 	SEGGER_SYSVIEW_DATA_SAMPLE HumPlot;
-	U32 hum = temp_hum->hum;
+	U32 hum = *temp_hum->hum;
 	HumPlot.ID = HUM_ID;
 	HumPlot.pValue.pU32 = &hum;
 	DEBUG_SEGGER_SYSVIEW_SampleData(&HumPlot);
 #ifdef DEBUG
-	printf("Temperature: %d, Humidity %d\n",(temp_hum->temp - 1000) / 10, temp_hum->hum/ 10);
+	printf("Temperature: %d, Humidity %d\n",(*temp_hum->temp - 1000) / 10, *temp_hum->hum/ 10);
 #endif
 	record_sysview_measure_temp_exit(0);
 }

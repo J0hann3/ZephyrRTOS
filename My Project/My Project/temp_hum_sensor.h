@@ -11,8 +11,8 @@ typedef struct s_temp_measure
 {
     struct io_descriptor *i2c_device;
 
-    uint16_t temp;
-    uint16_t hum;
+    uint16_t *temp;
+    uint16_t *hum;
 
     uint32_t time_start_measure;
 } temp_measure;

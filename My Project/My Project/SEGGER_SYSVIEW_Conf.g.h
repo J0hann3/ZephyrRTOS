@@ -69,19 +69,20 @@
 #define ID_SYSVIEW_CONFIG_LIGHT_SENSOR 34       //config= %u, %u, %u | Returns %u
 #define ID_SYSVIEW_MEASURE_LIGHT 35       //Start measure | Returns %u
 #define ID_SYSVIEW_MEASURE_TEMP 36       //Start measure | Returns %u
-#define ID_SYSVIEW_SD_CARD_DETECTED 37       //isDetected=%Bool
-#define ID_SYSVIEW_OPEN_SD_CARD 38       // | Returns %u
-#define ID_SYSVIEW_CLOSE_SD_CARD 39       //
-#define ID_SYSVIEW_MOUNT_SD_CARD 40       //
-#define ID_SYSVIEW_UNMOUNT_SD_CARD 41       //
-#define ID_SYSVIEW_SLEEP_SD_CARD 42       //
-#define ID_SYSVIEW_WAKE_UP_SD_CARD 43       //
-#define ID_SYSVIEW_WRITE_SD_CARD 44       //
-#define ID_SYSVIEW_WORK_QUEUE_INIT 45       //
-#define ID_SYSVIEW_WORK_QUEUE_ENQUEUE 46       //%d / %d
-#define ID_SYSVIEW_WORK_QUEUE_PROCESS 47       //
-#define ID_SYSVIEW_WORK_QUEUE_IS_EMPTY 48       //Is Empty: %d
-#define ID_SYSVIEW_WORK_QUEUE_ERROR 49       //Error: %WorkQueueError
+#define ID_SYSVIEW_MEASURE_LOGGER_WRITE 37       //
+#define ID_SYSVIEW_SD_CARD_DETECTED 38       //isDetected=%Bool
+#define ID_SYSVIEW_OPEN_SD_CARD 39       // | Returns %u
+#define ID_SYSVIEW_CLOSE_SD_CARD 40       //
+#define ID_SYSVIEW_MOUNT_SD_CARD 41       //
+#define ID_SYSVIEW_UNMOUNT_SD_CARD 42       //
+#define ID_SYSVIEW_SLEEP_SD_CARD 43       //
+#define ID_SYSVIEW_WAKE_UP_SD_CARD 44       //
+#define ID_SYSVIEW_WRITE_SD_CARD 45       //
+#define ID_SYSVIEW_WORK_QUEUE_INIT 46       //
+#define ID_SYSVIEW_WORK_QUEUE_ENQUEUE 47       //%d / %d
+#define ID_SYSVIEW_WORK_QUEUE_PROCESS 48       //
+#define ID_SYSVIEW_WORK_QUEUE_IS_EMPTY 49       //Is Empty: %d
+#define ID_SYSVIEW_WORK_QUEUE_ERROR 50       //Error: %WorkQueueError
 
 //
 // Define Sysview macro functions to record events.
@@ -97,6 +98,7 @@
 #define record_sysview_measure_light_exit(int0) SEGGER_SYSVIEW_RecordEndCallU32(ID_SYSVIEW_MEASURE_LIGHT, int0)       // SystemView function: 'measure_light', return description: 'Returns %u'
 #define record_sysview_measure_temp_enter() SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_MEASURE_TEMP)       // SystenView function: 'measure_temp', description: 'Start measure'
 #define record_sysview_measure_temp_exit(int0) SEGGER_SYSVIEW_RecordEndCallU32(ID_SYSVIEW_MEASURE_TEMP, int0)       // SystemView function: 'measure_temp', return description: 'Returns %u'
+#define record_sysview_measure_logger_write() SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_MEASURE_LOGGER_WRITE)     //SystenView function: 'measure_logger_write', no description
 #define record_sysview_sd_card_detected(int0) SEGGER_SYSVIEW_RecordU32(ID_SYSVIEW_SD_CARD_DETECTED, int0)       // SystenView function: 'sd_card_detected', description: 'isDetected=%Bool'
 #define record_sysview_open_sd_card_enter() SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_OPEN_SD_CARD)     //SystenView function: 'open_sd_card', no description
 #define record_sysview_open_sd_card_exit(int0) SEGGER_SYSVIEW_RecordEndCallU32(ID_SYSVIEW_OPEN_SD_CARD, int0)       // SystemView function: 'open_sd_card', return description: 'Returns %u'
@@ -123,6 +125,7 @@
 #define record_sysview_measure_light_exit(int0)
 #define record_sysview_measure_temp_enter()
 #define record_sysview_measure_temp_exit(int0)
+#define record_sysview_measure_logger_write()
 #define record_sysview_sd_card_detected(int0)
 #define record_sysview_open_sd_card_enter()
 #define record_sysview_open_sd_card_exit(int0)

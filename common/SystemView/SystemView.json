@@ -12,6 +12,7 @@
         {"FunctionName" : "config_light_sensor", "ParameterDescription" : "config= %u, %u, %u", "ReturnValueDescription" : "Returns %u"},
         {"FunctionName" : "measure_light", "ParameterDescription" : "Start measure", "ReturnValueDescription" : "Returns %u"},
         {"FunctionName" : "measure_temp", "ParameterDescription" : "Start measure", "ReturnValueDescription" : "Returns %u"},
+        {"FunctionName" : "measure_logger_write"},
         {"FunctionName" : "sd_card_detected", "ParameterDescription" : "isDetected=%Bool"},
         {"FunctionName" : "open_sd_card", "ReturnValueDescription" : "Returns %u"},
         {"FunctionName" : "close_sd_card"},

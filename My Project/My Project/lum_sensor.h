@@ -11,7 +11,7 @@ typedef struct s_light_measure
 {
     struct io_descriptor *i2c_device;
 
-    uint16_t light;
+    uint16_t *light;
 
     uint32_t time_start_measure;
 } light_measure;

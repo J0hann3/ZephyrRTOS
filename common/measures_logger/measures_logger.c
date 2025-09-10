@@ -3,8 +3,12 @@
 
 #include "measures_logger.h"
 #include "temp_hum_sensor.h"
+#include "SEGGER_SYSVIEW.h"
+#include "work_queue.h"
 
 measures_stack_t m_stack;
+
+static void measure_logger_reset_measure(measure_t *measure);
 
 bool measures_logger_init(const uint16_t measuring_period)
 {
@@ -86,34 +90,40 @@ bool measures_logger_read(measure_t *last_measure)
  *  Summary:
  *    Write new_measure to m_stack at head index.
  */
-void measures_logger_write(const measure_t *new_measure)
+void measures_logger_write(void *const arg)
 {
-  if (new_measure->LUM_SENSOR_EN && new_measure->brightness == UINT16_MAX
-    || new_measure->TEMP_HUM_SENSOR_EN && (new_measure->humidity == UINT16_MAX || new_measure->humidity == UINT16_MAX))
-    return ;
-  if (m_stack.size == 0)
-  {
-	  m_stack.errorValue = MEASURES_LOGGER_UNINITIALIZED;
-	  return ;
-  }
+  measure_t *new_measure = arg;
+
   if (new_measure == NULL)
   {
     m_stack.errorValue = MEASURES_LOGGER_INVALID_PARAMETER;
     return ;
+  }
+  if ((new_measure->LUM_SENSOR_EN && new_measure->brightness == UINT16_MAX)
+    || (new_measure->TEMP_HUM_SENSOR_EN && (new_measure->humidity == UINT16_MAX || new_measure->temperature == UINT16_MAX)))
+  {
+    wq_enqueue(measures_logger_write, arg);
+    return ;
+  }
+  if (m_stack.size == 0)
+  {
+	  m_stack.errorValue = MEASURES_LOGGER_UNINITIALIZED;
+	  return measure_logger_reset_measure(new_measure);
   }
 
   if (m_stack.counter != 0 && ((m_stack.head) % m_stack.size) == m_stack.tail)
   {
     /*Don't write on unread measure*/
     m_stack.errorValue = MEASURES_LOGGER_UNREADED_MEASURES;
-    return ;
+    return measure_logger_reset_measure(new_measure);
   }
 
+  DEBUG_SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_MEASURE_LOGGER_WRITE);
   m_stack.measure[m_stack.head] = *new_measure;
   m_stack.head                  = (m_stack.head + 1) % m_stack.size;
   m_stack.counter               = m_stack.counter + 1;
   m_stack.errorValue            = MEASURES_LOGGER_ERROR_OK;
-  return ;
+  return measure_logger_reset_measure(new_measure);
 }
 
 /*
@@ -169,4 +179,11 @@ bool measures_logger_read_CSV(char s_return[160])
   strncpy(s_return, s_measure, strlen(s_measure));
 
   return MEASURES_LOGGER_RES_SUCCESS;
+}
+
+static void measure_logger_reset_measure(measure_t *measure)
+{
+  measure->brightness = UINT16_MAX;
+  measure->temperature = UINT16_MAX;
+  measure->humidity = UINT16_MAX;
 }
