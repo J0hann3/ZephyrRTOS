@@ -397,6 +397,8 @@
       <Value>../hpl/tc</Value>
       <Value>../hri</Value>
       <Value>%24(PackRepoDir)\atmel\SAMD21_DFP\1.3.395\samd21a\include</Value>
+      <Value>../SystemView</Value>
+      <Value>../work_queue</Value>
     </ListValues>
   </armgcc.compiler.directories.IncludePaths>
   <armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
@@ -1042,6 +1044,9 @@
     <Compile Include="sd_card_driver\toolchain_specifics.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="SEGGER_SYSVIEW_Conf.g.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="sx126x.c">
       <SubType>compile</SubType>
     </Compile>
@@ -1093,7 +1098,13 @@
     <Compile Include="SystemView\sysview.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="SystemView\SYSVIEW_Config.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="SystemView\timestamp.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="SystemView\timestamp.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="temp_hum_sensor.c">

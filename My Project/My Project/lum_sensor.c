@@ -76,7 +76,7 @@ void read_lum_sensor(void *const arg)
 	}
 	light->light = ((uint16_t)data_read[1] << 8) + data_read[0];
 	light->light = (uint32_t) (light->light) * 82/100;
-	SEGGER_SYSVIEW_PrintfHost("Light sensor: %d", light->light);
+	DEBUG_SEGGER_SYSVIEW_PrintfHost("Light sensor: %d", light->light);
 #ifdef DEBUG
 	printf("Light sensor: %d\n", light->light);
 #endif

@@ -7,8 +7,8 @@
 extern struct i2c_m_sync_desc       I2C_0;
 
 void I2C_0_init(void);
-bool get_i2c_is_busy();
-void set_i2c_is_busy(bool is_busy);
+// bool get_i2c_is_busy();
+// void set_i2c_is_busy(bool is_busy);
 
 
 #endif

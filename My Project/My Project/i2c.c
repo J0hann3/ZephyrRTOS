@@ -8,8 +8,6 @@
 
 struct i2c_m_sync_desc I2C_0;
 
-static bool i2c_is_busy = false; 
-
 static void I2C_0_PORT_init(void)
 {
 
@@ -48,12 +46,12 @@ void I2C_0_init(void)
 	I2C_0_PORT_init();
 }
 
-bool get_i2c_is_busy()
-{
-    return i2c_is_busy;
-}
+// bool get_i2c_is_busy()
+// {
+//     return i2c_is_busy;
+// }
 
-void set_i2c_is_busy(bool is_busy)
-{
-    i2c_is_busy = is_busy;
-}
+// void set_i2c_is_busy(bool is_busy)
+// {
+//     i2c_is_busy = is_busy;
+// }

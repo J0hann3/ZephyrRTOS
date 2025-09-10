@@ -13,12 +13,6 @@ void temp_sensor_write_command(void *const arg)
 	temp_measure *temp_hum = arg;
 	uint8_t sensor_reg = 0xFD;
 
-	if (get_i2c_is_busy())
-	{
-		wq_enqueue(temp_sensor_write_command, temp_hum);
-		return;
-	}
-	set_i2c_is_busy(true);
 	record_sysview_measure_temp_enter();
 	i2c_m_sync_get_io_descriptor(&I2C_0, &temp_hum->i2c_device);
 	i2c_m_sync_enable(&I2C_0);
@@ -26,7 +20,6 @@ void temp_sensor_write_command(void *const arg)
 	uint8_t check = io_write(temp_hum->i2c_device, &sensor_reg, 1);
 	if (check != 1)
 	{
-		set_i2c_is_busy(false);
 	#ifdef DEBUG
 		printf("Failed to write/read I2C device address\n");
 	#endif
@@ -50,8 +43,9 @@ void temp_sensor_read_value(void *const arg)
 		return;
 	}
 
+	i2c_m_sync_set_slaveaddr(&I2C_0, SLAVE_ADDR_TEMP, I2C_M_SEVEN);
+	
 	uint8_t check = io_read(temp_hum->i2c_device, reading, 6);
-	set_i2c_is_busy(false);
 	if (check != 6)
 	{
 	#ifdef DEBUG
@@ -72,21 +66,21 @@ void temp_sensor_read_value(void *const arg)
 	u32_hum = ((uint32_t)(temp_hum->hum * 1907) - 6000000) / 100000;
 	temp_hum->hum = (uint16_t)u32_hum;
 
-	SEGGER_SYSVIEW_PrintfHost("Temperature: %d, Humidity %d\n", (temp_hum->temp - 1000) / 10, temp_hum->hum/ 10);
+	DEBUG_SEGGER_SYSVIEW_PrintfHost("Temperature: %u, Humidity %u\n", (temp_hum->temp - 1000) / 10, temp_hum->hum/ 10);
 
 	SEGGER_SYSVIEW_DATA_SAMPLE TempPlot;
 	U32 temp = (temp_hum->temp - 1000);
-	TempPlot.ID = 0;
+	TempPlot.ID = TEMP_ID;
 	TempPlot.pValue.pU32 = &temp;
-	SEGGER_SYSVIEW_SampleData(&TempPlot);
+	DEBUG_SEGGER_SYSVIEW_SampleData(&TempPlot);
 
 	SEGGER_SYSVIEW_DATA_SAMPLE HumPlot;
 	U32 hum = temp_hum->hum;
-	HumPlot.ID = 1;
+	HumPlot.ID = HUM_ID;
 	HumPlot.pValue.pU32 = &hum;
-	SEGGER_SYSVIEW_SampleData(&HumPlot);
+	DEBUG_SEGGER_SYSVIEW_SampleData(&HumPlot);
 #ifdef DEBUG
-	printf("Temperature: %d, Humidity %d\n", ((*temp) - 1000) / 10, (*humidity)/ 10);
+	printf("Temperature: %d, Humidity %d\n",(temp_hum->temp - 1000) / 10, temp_hum->hum/ 10);
 #endif
 	record_sysview_measure_temp_exit(0);
 }

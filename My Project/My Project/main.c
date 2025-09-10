@@ -107,15 +107,11 @@ int main(void)
 	DEBUG_SYSVIEW_AddTask(turn_off_light_sensor, "turn_off_light_sensor", 0);
 	DEBUG_SYSVIEW_AddTask(light_sensor_write_command, "light_sensor_write_command", 0);
 	DEBUG_SYSVIEW_AddTask(read_lum_sensor, "read_lum_sensor", 0);
-	
+
 	if (current_measure.LUM_SENSOR_EN)
-	{
-		wq_enqueue(turn_on_light_sensor, &i2c_light);
-	}
-	// if (current_measure.TEMP_HUM_SENSOR_EN)
-	// {
-	// 	wq_enqueue(temp_sensor_write_command, (void *)&i2c_temp);
-	// }
+		wq_enqueue(turn_on_light_sensor, (void *)&i2c_light);
+	if (current_measure.TEMP_HUM_SENSOR_EN)
+		wq_enqueue(temp_sensor_write_command, (void *)&i2c_temp);
 	// wq_enqueue(measures_logger_write);
 	// wq_enqueue(SYS_Tasks);
 
@@ -126,8 +122,10 @@ int main(void)
 			_go_to_sleep();
 		if (get_wake_up_calendar())
 		{
-			wq_enqueue(turn_on_light_sensor, &i2c_light);
-			// wq_enqueue(temp_sensor_write_command, (void *)&i2c_temp);
+			if (current_measure.LUM_SENSOR_EN)
+				wq_enqueue(turn_on_light_sensor, (void *)&i2c_light);
+			if (current_measure.TEMP_HUM_SENSOR_EN)
+				wq_enqueue(temp_sensor_write_command, (void *)&i2c_temp);
 			clear_wake_up_calendar();
 		}
 	}
