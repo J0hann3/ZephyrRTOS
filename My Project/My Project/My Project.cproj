@@ -262,6 +262,7 @@
       <Value>../hri</Value>
       <Value>%24(PackRepoDir)\atmel\SAMD21_DFP\1.3.395\samd21a\include</Value>
       <Value>../SystemView</Value>
+      <Value>../work_queue</Value>
     </ListValues>
   </armgcc.compiler.directories.IncludePaths>
   <armgcc.compiler.optimization.level>Optimize for size (-Os)</armgcc.compiler.optimization.level>
@@ -846,6 +847,12 @@
     <Compile Include="hri\hri_wdt_d21.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="i2c.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="i2c.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="lum_sensor.c">
       <SubType>compile</SubType>
     </Compile>
@@ -1101,6 +1108,12 @@
     <Compile Include="tools.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="work_queue\work_queue.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="work_queue\work_queue.h">
+      <SubType>compile</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Config\" />
@@ -1152,6 +1165,7 @@
     <Folder Include="SystemView\Config\" />
     <Folder Include="SystemView\SEGGER\" />
     <Folder Include="SystemView\SEGGER\Syscalls\" />
+    <Folder Include="work_queue\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Device_Startup\samd21g18a_flash.ld">

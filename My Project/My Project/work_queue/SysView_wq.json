@@ -1,0 +1,55 @@
+{
+    "NamedType": [
+        {
+            "TypeName": "OSError",
+            "Fields": [
+                {
+                    "Key": "0",
+                    "Value": "Success"
+                },
+                {
+                    "Key": "1",
+                    "Value": "Error"
+                }
+            ]
+        },
+        {
+            "TypeName": "WorkQueueError",
+            "Fields": [
+                {
+                    "Key": "0",
+                    "Value": "No_Error"
+                },
+                {
+                    "Key": "1",
+                    "Value": "Overflow"
+                },
+                {
+                    "Key": "2",
+                    "Value": "Null_Worker_Pointer"
+                }
+            ]
+        }
+    ],
+    "Function": [
+        {
+            "FunctionName": "work_queue_init"
+        },
+        {
+            "FunctionName": "work_queue_enqueue",
+            "ParameterDescription":  "%d / %d"     
+        },
+        {
+            "FunctionName": "work_queue_process"
+        },
+        {
+            "FunctionName": "work_queue_is_empty",
+            "ParameterDescription": "Is Empty: %d"
+        }
+        ,
+        {
+            "FunctionName": "work_queue_error",
+            "ParameterDescription": "Error: %WorkQueueError"
+        }
+    ]
+}

@@ -7,6 +7,7 @@
 #include "SEGGER_RTT.h"
 #include "SEGGER_SYSVIEW_Conf.h"
 #include "SEGGER_SYSVIEW.h"
+#include "work_queue.h"
 
 bool wake_up_tc_timestamp = false;
 
@@ -85,7 +86,7 @@ void BoardInitPeriph(void)
 int main(void)
 {
 	struct io_descriptor *i2c_lum = {0};
-	struct io_descriptor *i2c_temp = {0};
+	temp_measure i2c_temp = {0};
 	measure_t current_measure = {.TEMP_HUM_SENSOR_EN = 1,
 								.LUM_SENSOR_EN = 1};
 							
@@ -99,32 +100,57 @@ int main(void)
 
 	SYSVIEW_init();
 	
+	wq_init();
+	// if (current_measure.LUM_SENSOR_EN)
+	// {
+	// 	wq_enqueue();
+
+	// }
+	if (current_measure.TEMP_HUM_SENSOR_EN)
+	{
+		wq_enqueue(temp_sensor_write_command, (void *)&i2c_temp);
+	}
+	// wq_enqueue(measures_logger_write);
+	// wq_enqueue(SYS_Tasks);
+
 	while (1)
 	{
-		if (current_measure.LUM_SENSOR_EN && init_and_read_lum_sensor(i2c_lum,
-					&current_measure.brightness) == 1 )
-			return 1;
-		if (current_measure.TEMP_HUM_SENSOR_EN && read_temp_sensor(i2c_temp, &current_measure.temperature,
-					&current_measure.humidity) == 1 )
-			return 1;
-		measures_logger_write(&current_measure);
-		size_t count = measures_logger_count();
-		uint16_t size = measures_logger_get_size();
-		if (count >= size)
-			SYS_Tasks(USUAL_ACCESS);
-		wake_up_tc_timestamp = false;
-		wake_up_calendar = false;
-		SEGGER_SYSVIEW_OnIdle();
-		_go_to_sleep();
-		SEGGER_SYSVIEW_OnTaskStartExec((U32)main);
-
-		while (wake_up_tc_timestamp && !wake_up_calendar)
-		{
-			wake_up_tc_timestamp = false;
-			SEGGER_SYSVIEW_OnIdle();
+		wq_process();
+		if (!wq_not_empty())
 			_go_to_sleep();
-			SEGGER_SYSVIEW_OnTaskStartExec((U32)main);
+		if (get_wake_up_calendar())
+		{
+			wq_enqueue(temp_sensor_write_command, (void *)&i2c_temp);
+			clear_wake_up_calendar();
 		}
 	}
+
+	// while (1)
+	// {
+	// 	if (current_measure.LUM_SENSOR_EN && init_and_read_lum_sensor(i2c_lum,
+	// 				&current_measure.brightness) == 1 )
+	// 		return 1;
+	// 	if (current_measure.TEMP_HUM_SENSOR_EN && read_temp_sensor(i2c_temp, &current_measure.temperature,
+	// 				&current_measure.humidity) == 1 )
+	// 		return 1;
+	// 	measures_logger_write(&current_measure);
+	// 	size_t count = measures_logger_count();
+	// 	uint16_t size = measures_logger_get_size();
+	// 	if (count >= size)
+	// 		SYS_Tasks(USUAL_ACCESS);
+	// 	wake_up_tc_timestamp = false;
+	// 	wake_up_calendar = false;
+	// 	SEGGER_SYSVIEW_OnIdle();
+	// 	_go_to_sleep();
+	// 	SEGGER_SYSVIEW_OnTaskStartExec((U32)main);
+
+	// 	while (wake_up_tc_timestamp && !wake_up_calendar)
+	// 	{
+	// 		wake_up_tc_timestamp = false;
+	// 		SEGGER_SYSVIEW_OnIdle();
+	// 		_go_to_sleep();
+	// 		SEGGER_SYSVIEW_OnTaskStartExec((U32)main);
+	// 	}
+	// }
 	return 0;
 }

@@ -1,4 +1,5 @@
 #include "lum_sensor.h"
+#include "i2c.h"
 #include <SEGGER_SYSVIEW.h>
 
 int init_lum_sensor(struct io_descriptor *lum_device)

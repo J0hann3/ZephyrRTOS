@@ -1,4 +1,5 @@
 #ifndef TOOLS_H
+#define TOOLS_H
 
 extern struct spi_m_sync_descriptor Spi0;
 
