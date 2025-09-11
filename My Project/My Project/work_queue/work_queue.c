@@ -106,7 +106,7 @@ void wq_process()
 
 bool wq_not_empty()
 {
-    DEBUG_SEGGER_SYSVIEW_RecordU32(ID_SYSVIEW_WORK_QUEUE_IS_EMPTY, wq_count != 0);
+    DEBUG_SEGGER_SYSVIEW_RecordU32(ID_SYSVIEW_WORK_QUEUE_IS_NOT_EMPTY, wq_count != 0);
     return wq_count != 0;
 }
 

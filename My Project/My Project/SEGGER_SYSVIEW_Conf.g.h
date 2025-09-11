@@ -81,7 +81,7 @@
 #define ID_SYSVIEW_WORK_QUEUE_INIT 46       //
 #define ID_SYSVIEW_WORK_QUEUE_ENQUEUE 47       //%d / %d
 #define ID_SYSVIEW_WORK_QUEUE_PROCESS 48       //
-#define ID_SYSVIEW_WORK_QUEUE_IS_EMPTY 49       //Is Empty: %d
+#define ID_SYSVIEW_WORK_QUEUE_IS_NOT_EMPTY 49       //Is not Empty: %d
 #define ID_SYSVIEW_WORK_QUEUE_ERROR 50       //Error: %WorkQueueError
 
 //
@@ -111,7 +111,7 @@
 #define record_sysview_work_queue_init() SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_WORK_QUEUE_INIT)     //SystenView function: 'work_queue_init', no description
 #define record_sysview_work_queue_enqueue(int0, int1) SEGGER_SYSVIEW_RecordU32x2(ID_SYSVIEW_WORK_QUEUE_ENQUEUE, int0, int1)       // SystenView function: 'work_queue_enqueue', description: '%d / %d'
 #define record_sysview_work_queue_process() SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_WORK_QUEUE_PROCESS)     //SystenView function: 'work_queue_process', no description
-#define record_sysview_work_queue_is_empty(int0) SEGGER_SYSVIEW_RecordU32(ID_SYSVIEW_WORK_QUEUE_IS_EMPTY, int0)       // SystenView function: 'work_queue_is_empty', description: 'Is Empty: %d'
+#define record_sysview_work_queue_is_not_empty(int0) SEGGER_SYSVIEW_RecordU32(ID_SYSVIEW_WORK_QUEUE_IS_NOT_EMPTY, int0)       // SystenView function: 'work_queue_is_not_empty', description: 'Is not Empty: %d'
 #define record_sysview_work_queue_error(int0) SEGGER_SYSVIEW_RecordU32(ID_SYSVIEW_WORK_QUEUE_ERROR, int0)       // SystenView function: 'work_queue_error', description: 'Error: %WorkQueueError'
 
 #else // define SEGGER_SYSTEM_VIEW
@@ -138,7 +138,7 @@
 #define record_sysview_work_queue_init()
 #define record_sysview_work_queue_enqueue(int0, int1)
 #define record_sysview_work_queue_process()
-#define record_sysview_work_queue_is_empty(int0)
+#define record_sysview_work_queue_is_not_empty(int0)
 #define record_sysview_work_queue_error(int0)
 
 #endif // not define SEGGER_SYSTEM_VIEW

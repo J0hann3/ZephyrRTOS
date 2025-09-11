@@ -197,6 +197,7 @@ void APP_Initialize(void);
     This routine must be called from SYS_Tasks() routine.
  */
 
+void sd_card_write(void *const);
 void APP_Tasks(void);
 
 APP_STATES get_sd_app_state();

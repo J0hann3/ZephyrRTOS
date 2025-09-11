@@ -13,6 +13,7 @@
 #include "measures_logger.h"
 #include "definitions.h"
 #include "SEGGER_SYSVIEW.h"
+#include "work_queue.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -46,63 +47,26 @@
 
 APP_DATA        appData;
 
-// *****************************************************************************
-// *****************************************************************************
-// Section: System "Tasks" Routine
-// *****************************************************************************
-// *****************************************************************************
-
-/*******************************************************************************
-  Function:
-    void SYS_Tasks ( void )
-
-  Remarks:
-    See prototype in system/common/sys_module.h.
-*/
-bool SYS_Tasks(APP_ACCESS access)
+void sd_card_write(void *const arg)
 {
-  bool error = true;
+  (void) arg;
+  
+  /* Maintain system services */
+  SYS_FS_Tasks();
 
-  sd_card_wake_from_sleep();
+  /* Maintain Device Drivers */
+  DRV_SDSPI_Tasks(sysObj.drvSDSPI0);
 
-  /* Reading card detect input */
-  if (sd_card_is_card_detected() != true)
-  {
-	#ifdef DEBUG
-	  printf("Card not detected\n");
-  #endif
-    record_sysview_sd_card_detected(TYPE_SYSVIEW_BOOL_FALSE);
-    // SEGGER_SYSVIEW_RecordU32(ID_SYSVIEW_E_SD_CARD_DETECTED, 0);
-    SEGGER_SYSVIEW_Warn("No card detected\n");
-  }
+  /* Maintain the application's state machine. */
+  APP_Tasks();
+
+  if (get_sd_app_state() < APP_IDLE)
+    wq_enqueue(sd_card_write, NULL);
   else
   {
-    record_sysview_sd_card_detected(TYPE_SYSVIEW_BOOL_TRUE);
-    // SEGGER_SYSVIEW_RecordU32(ID_SYSVIEW_E_SD_CARD_DETECTED, 1);
-
-    /* try to write until success (APP_IDLE) or error (APP_ERROR). */
-    while (get_sd_app_state() < APP_IDLE)
-    {
-      /* Maintain system services */
-      SYS_FS_Tasks();
-
-      /* Maintain Device Drivers */
-      DRV_SDSPI_Tasks(sysObj.drvSDSPI0);
-
-      /* Maintain the application's state machine. */
-      APP_Tasks();
-
-      if (get_sd_app_state() != APP_ERROR)
-        error = false;
-    }
+    set_sd_app_state(APP_START);
+    sd_card_go_to_sleep();
   }
-
-  /*re init application's state machine*/
-  set_sd_app_state(APP_START);
-
-  sd_card_go_to_sleep();
-
-  return error;
 }
 
 // *****************************************************************************
@@ -146,11 +110,27 @@ void APP_Tasks(void)
   switch (appData.state)
   {
   case APP_START :
-    appData.state = APP_MOUNT_DISK;
+    sd_card_wake_from_sleep();
+
+    /* Reading card detect input */
+    if (sd_card_is_card_detected() != true)
+    {
+    #ifdef DEBUG
+      printf("Card not detected\n");
+    #endif
+      record_sysview_sd_card_detected(TYPE_SYSVIEW_BOOL_FALSE);
+      // SEGGER_SYSVIEW_RecordU32(ID_SYSVIEW_E_SD_CARD_DETECTED, 0);
+      SEGGER_SYSVIEW_Warn("No card detected\n");
+      appData.state = APP_IDLE;
+    }
+    else
+    {
+      record_sysview_sd_card_detected(TYPE_SYSVIEW_BOOL_TRUE);
+      appData.state = APP_MOUNT_DISK;
+    }
     break;
   case APP_MOUNT_DISK :
     record_sysview_mount_sd_card();
-    // SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_E_MOUNT_SD_CARD);
     if (SYS_FS_Mount(SDCARD_DEV_NAME, SDCARD_MOUNT_NAME, FAT, 0, NULL) != 0)
     {
       /* The disk could not be mounted. Try
@@ -186,7 +166,6 @@ void APP_Tasks(void)
 
   case APP_OPEN_FIRST_FILE :
     record_sysview_open_sd_card_enter();
-    // SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_E_OPEN_SD_CARD);
 
     appData.fileHandle = SYS_FS_FileOpen(currentfilename, (SYS_FS_FILE_OPEN_APPEND));
 
@@ -227,7 +206,6 @@ void APP_Tasks(void)
   case APP_WRITE_TO_FILE : ;
     /* Product CSV line */
     record_sysview_write_sd_card();
-    // SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_E_WRITE_SD_CARD);
 
     // Read FIFO and write to SD until measures_FIFO is empty
     uint16_t ml_size = measures_logger_get_size();
@@ -259,7 +237,7 @@ void APP_Tasks(void)
       }
 
       strcat(csvline, "\r\n");
-      SEGGER_SYSVIEW_Print(csvline);
+      DEBUG_SEGGER_SYSVIEW_Print(csvline);
 
       if (SYS_FS_FileStringPut(appData.fileHandle, csvline) == SYS_FS_RES_FAILURE)
       {
@@ -289,7 +267,6 @@ void APP_Tasks(void)
 
   case APP_UNMOUNT_DISK :
     record_sysview_unmount_sd_card();
-    // SEGGER_SYSVIEW_RecordVoid(ID_SYSVIEW_E_UNMOUNT_SD_CARD);
 
     if (SYS_FS_Unmount(SDCARD_MOUNT_NAME) != 0)
     {
@@ -301,6 +278,7 @@ void APP_Tasks(void)
       if (mountUnmount_try_counter >= MOUNTUNMOUNT_MAX_TRY)
       {
         appData.state = APP_ERROR;
+        mountUnmount_try_counter = 0;
       }
     }
     else
@@ -329,7 +307,6 @@ void APP_Tasks(void)
   case APP_IDLE :
     /* The application comes here when the demo has completed
      * successfully. */
-    mountUnmount_try_counter = 0;
     break;
 
   case APP_ERROR :

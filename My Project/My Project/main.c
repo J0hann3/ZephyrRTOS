@@ -7,10 +7,81 @@
 #include "SEGGER_SYSVIEW_Conf.h"
 #include "SEGGER_SYSVIEW.h"
 #include "work_queue.h"
+#include "measures_logger.h"
+#include "timestamp.h"
 
-bool wake_up_tc_timestamp = false;
+static void go_to_sleep();
+static void BoardInitPeriph(void);
 
-void BoardInitPeriph(void)
+int main(void)
+{
+	measure_t current_measure = {.brightness = UINT16_MAX,
+							.humidity = UINT16_MAX,
+							.temperature = UINT16_MAX,
+							.TEMP_HUM_SENSOR_EN = 1,
+							.LUM_SENSOR_EN = 1};
+	light_measure i2c_light = {.light = &current_measure.brightness,
+							.state = LIGHT_SENSOR_TURN_ON};
+	temp_measure i2c_temp = {.hum = &current_measure.humidity,
+							.temp = &current_measure.temperature,
+							.state = TEMP_SENSOR_WRITE_COMMAND};
+							
+	system_init();
+	BoardInitPeriph();
+	spi_go_to_sleep();
+
+	sd_card_power_off();
+	SYS_Initialize(NULL);
+	measures_logger_init(1);
+
+	SYSVIEW_init();
+	
+	wq_init();
+	if (current_measure.LUM_SENSOR_EN)
+		wq_enqueue(measure_light_sensor, (void *)&i2c_light);
+	if (current_measure.TEMP_HUM_SENSOR_EN)
+		wq_enqueue(measure_temp_hum_sensor, (void *)&i2c_temp);
+
+	while (1)
+	{
+		while (wq_not_empty())
+		{
+			wq_process();
+		}
+		measures_logger_write(&current_measure);
+		if (measures_logger_count() >= measures_logger_get_size())
+			sd_card_write(NULL);
+
+		go_to_sleep();
+		if (get_wake_up_calendar())
+		{
+			if (current_measure.LUM_SENSOR_EN)
+				wq_enqueue(measure_light_sensor, (void *)&i2c_light);
+			if (current_measure.TEMP_HUM_SENSOR_EN)
+				wq_enqueue(measure_temp_hum_sensor, (void *)&i2c_temp);
+			clear_wake_up_calendar();
+		}
+	}
+	return 0;
+}
+
+static void go_to_sleep()
+{
+	if (wq_not_empty())
+		return;
+	// DEBUG_SEGGER_SYSVIEW_OnIdle();
+	_go_to_sleep();
+	// DEBUG_SEGGER_SYSVIEW_OnTaskStartExec((U32)main);
+	// while (get_tc_timestamp_status() && !get_wake_up_calendar())
+	// {
+	// 	reset_tc_timestamp_status();
+	// 	DEBUG_SEGGER_SYSVIEW_OnIdle();
+	// 	_go_to_sleep();
+	// 	DEBUG_SEGGER_SYSVIEW_OnTaskStartExec((U32)main);
+	// }
+}
+
+static void BoardInitPeriph(void)
 {
 	// inputs
 	gpio_set_pin_direction(NFC_FD, GPIO_DIRECTION_IN);
@@ -80,87 +151,4 @@ void BoardInitPeriph(void)
 	// Magnet detector
 	gpio_set_pin_direction(MAGNET_DETECTOR_VCC, GPIO_DIRECTION_OUT);
 	gpio_set_pin_level(MAGNET_DETECTOR_VCC, false);
-}
-
-int main(void)
-{
-	measure_t current_measure = {.brightness = UINT16_MAX,
-							.humidity = UINT16_MAX,
-							.temperature = UINT16_MAX,
-							.TEMP_HUM_SENSOR_EN = 1,
-							.LUM_SENSOR_EN = 1};
-	light_measure i2c_light = {.light = &current_measure.brightness};
-	temp_measure i2c_temp = {.hum = &current_measure.humidity,
-							.temp = &current_measure.temperature};
-							
-	system_init();
-	BoardInitPeriph();
-	spi_go_to_sleep();
-
-	sd_card_power_off();
-	SYS_Initialize(NULL);
-	measures_logger_init(1);
-
-	SYSVIEW_init();
-	
-	wq_init();
-	DEBUG_SYSVIEW_AddTask(temp_sensor_write_command, "temp_sensor_write_command", 0);
-	DEBUG_SYSVIEW_AddTask(temp_sensor_read_value, "temp_sensor_read_value", 0);
-	DEBUG_SYSVIEW_AddTask(turn_on_light_sensor, "turn_on_light_sensor", 0);
-	DEBUG_SYSVIEW_AddTask(turn_off_light_sensor, "turn_off_light_sensor", 0);
-	DEBUG_SYSVIEW_AddTask(light_sensor_write_command, "light_sensor_write_command", 0);
-	DEBUG_SYSVIEW_AddTask(read_lum_sensor, "read_lum_sensor", 0);
-	DEBUG_SYSVIEW_AddTask(measures_logger_write, "measures_logger_write", 0);
-
-	if (current_measure.LUM_SENSOR_EN)
-		wq_enqueue(turn_on_light_sensor, (void *)&i2c_light);
-	if (current_measure.TEMP_HUM_SENSOR_EN)
-		wq_enqueue(temp_sensor_write_command, (void *)&i2c_temp);
-	wq_enqueue(measures_logger_write, (void *)&current_measure);
-	// wq_enqueue(SYS_Tasks);
-
-	while (1)
-	{
-		wq_process();
-		if (!wq_not_empty())
-			_go_to_sleep();
-		if (get_wake_up_calendar())
-		{
-			if (current_measure.LUM_SENSOR_EN)
-				wq_enqueue(turn_on_light_sensor, (void *)&i2c_light);
-			if (current_measure.TEMP_HUM_SENSOR_EN)
-				wq_enqueue(temp_sensor_write_command, (void *)&i2c_temp);
-			wq_enqueue(measures_logger_write, (void *)&current_measure);
-			clear_wake_up_calendar();
-		}
-	}
-
-	// while (1)
-	// {
-		// if (current_measure.LUM_SENSOR_EN && init_and_read_lum_sensor(i2c_lum,
-		// 			&current_measure.brightness) == 1 )
-		// 	return 1;
-		// if (current_measure.TEMP_HUM_SENSOR_EN && read_temp_sensor(i2c_temp, &current_measure.temperature,
-		// 			&current_measure.humidity) == 1 )
-		// 	return 1;
-	// 	measures_logger_write(&current_measure);
-	// 	size_t count = measures_logger_count();
-	// 	uint16_t size = measures_logger_get_size();
-	// 	if (count >= size)
-	// 		SYS_Tasks(USUAL_ACCESS);
-	// 	wake_up_tc_timestamp = false;
-	// 	wake_up_calendar = false;
-	// 	SEGGER_SYSVIEW_OnIdle();
-	// 	_go_to_sleep();
-	// 	SEGGER_SYSVIEW_OnTaskStartExec((U32)main);
-
-	// 	while (wake_up_tc_timestamp && !wake_up_calendar)
-	// 	{
-	// 		wake_up_tc_timestamp = false;
-	// 		SEGGER_SYSVIEW_OnIdle();
-	// 		_go_to_sleep();
-	// 		SEGGER_SYSVIEW_OnTaskStartExec((U32)main);
-	// 	}
-	// }
-	return 0;
 }

@@ -197,7 +197,7 @@ void SYSVIEW_AddTask(void* pTask, const char* sName, U32 Prio)
 
     SEGGER_SYSVIEW_OnTaskCreate((U32) pTask);
 
-    if (_NumTasks > SYSVIEW_NUM_TASKS)
+    if (_NumTasks >= SYSVIEW_NUM_TASKS)
     {
         return;
     }

@@ -3,9 +3,11 @@
 #include <stdint.h>
 
 #include "timestamp.h"
+#include "lum_sensor.h"
+#include "temp_hum_sensor.h"
+#include "sd_card_driver/definitions.h"
 
 int  main();
-void delay_ms(const uint16_t ms);
 
 void _cbSendIsrName(void)
 {
@@ -19,6 +21,9 @@ void SYSVIEW_init()
 #endif
     DEBUG_SEGGER_SYSVIEW_Conf();  /* Configure and initialize SystemView  */
     DEBUG_SEGGER_SYSVIEW_Start(); /* Starts SystemView recording*/
+	DEBUG_SYSVIEW_AddTask(measure_light_sensor, "measure_light_sensor", 0);
+	DEBUG_SYSVIEW_AddTask(measure_temp_hum_sensor, "measure_temp_hum_sensor", 0);
+	DEBUG_SYSVIEW_AddTask(sd_card_write, "sd_card_write", 0);
     DEBUG_SYSVIEW_AddTask(main, "main", 10);
     DEBUG_SEGGER_SYSVIEW_OnTaskStartExec((U32) main);
     DEBUG_SYSVIEW_AddDataRegister(TEMP_ID, "temperature", SEGGER_SYSVIEW_TYPE_U32, "°C");

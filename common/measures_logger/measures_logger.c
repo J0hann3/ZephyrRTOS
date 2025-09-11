@@ -90,10 +90,8 @@ bool measures_logger_read(measure_t *last_measure)
  *  Summary:
  *    Write new_measure to m_stack at head index.
  */
-void measures_logger_write(void *const arg)
+void measures_logger_write(measure_t *new_measure)
 {
-  measure_t *new_measure = arg;
-
   if (new_measure == NULL)
   {
     m_stack.errorValue = MEASURES_LOGGER_INVALID_PARAMETER;
@@ -102,7 +100,6 @@ void measures_logger_write(void *const arg)
   if ((new_measure->LUM_SENSOR_EN && new_measure->brightness == UINT16_MAX)
     || (new_measure->TEMP_HUM_SENSOR_EN && (new_measure->humidity == UINT16_MAX || new_measure->temperature == UINT16_MAX)))
   {
-    wq_enqueue(measures_logger_write, arg);
     return ;
   }
   if (m_stack.size == 0)

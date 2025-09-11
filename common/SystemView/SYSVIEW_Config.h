@@ -40,4 +40,6 @@
 #define TEMP_ID 0
 #define HUM_ID 1
 
+#define SYSVIEW_NUM_TASKS 24
+
 #endif

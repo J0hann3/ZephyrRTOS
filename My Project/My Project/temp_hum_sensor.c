@@ -6,11 +6,36 @@
 
 #define DELAY_TEMP_SENSOR 10 //ms
 
-void temp_sensor_read_value(void *const temp_hum);
+static void temp_sensor_read_value(temp_measure *temp_hum);
+static void temp_sensor_write_command(temp_measure *temp_hum);
 
-void temp_sensor_write_command(void *const arg)
+void measure_temp_hum_sensor(void *const arg)
 {
-	temp_measure *temp_hum = arg;
+	temp_measure *temp = arg;
+
+	switch(temp->state)
+	{
+		case TEMP_SENSOR_WRITE_COMMAND:
+			temp_sensor_write_command(temp);
+			break;
+		case TEMP_SENSOR_READ_VALUE:
+			temp_sensor_read_value(temp);
+			break;
+		case TEMP_SENSOR_ERROR:
+		case TEMP_SENSOR_IDLE:
+			break;
+		default:
+			break;
+	}
+	if (temp->state != TEMP_SENSOR_IDLE && temp->state != TEMP_SENSOR_ERROR)
+		wq_enqueue(measure_temp_hum_sensor, arg);
+	else
+		temp->state = TEMP_SENSOR_WRITE_COMMAND;
+}
+
+
+static void temp_sensor_write_command(temp_measure *temp_hum)
+{
 	uint8_t sensor_reg = 0xFD;
 
 	record_sysview_measure_temp_enter();
@@ -24,24 +49,21 @@ void temp_sensor_write_command(void *const arg)
 		printf("Failed to write/read I2C device address\n");
 	#endif
 		record_sysview_measure_temp_exit(1);
+		temp_hum->state = TEMP_SENSOR_ERROR;
 		return;
 	}
 	temp_hum->time_start_measure = get_timestamp();
-	wq_enqueue(temp_sensor_read_value, temp_hum);
+	temp_hum->state = TEMP_SENSOR_READ_VALUE;
 }
 
-void temp_sensor_read_value(void *const arg)
+static void temp_sensor_read_value(temp_measure *temp_hum)
 {
-	temp_measure *temp_hum = arg;
 	uint8_t reading[6]= {0};
 	uint32_t u32_temp;
 	uint32_t u32_hum;
 	
 	if (!is_delay_reach(DELAY_TEMP_SENSOR, temp_hum->time_start_measure))
-	{
-		wq_enqueue(temp_sensor_read_value, arg);
 		return;
-	}
 
 	i2c_m_sync_set_slaveaddr(&I2C_0, SLAVE_ADDR_TEMP, I2C_M_SEVEN);
 	
@@ -52,6 +74,7 @@ void temp_sensor_read_value(void *const arg)
 		printf("Error invalid number of bytes read: %d\n", check);
 	#endif
 		record_sysview_measure_temp_exit(1);
+		temp_hum->state = TEMP_SENSOR_ERROR;
 		return ;
 	}
 
@@ -83,14 +106,8 @@ void temp_sensor_read_value(void *const arg)
 	printf("Temperature: %d, Humidity %d\n",(*temp_hum->temp - 1000) / 10, *temp_hum->hum/ 10);
 #endif
 	record_sysview_measure_temp_exit(0);
+	temp_hum->state = TEMP_SENSOR_IDLE;
 }
-
-// void read_temp_sensor(temp_measure *temp_hum)
-// {
-// 	temp_sensor_write_command(temp_hum);
-// 	delay_ms(10);
-// 	temp_sensor_read_value(temp_hum);
-// }
 
 void ftoa(float fnum, char res[5])
 {

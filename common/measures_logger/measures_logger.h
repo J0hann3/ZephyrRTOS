@@ -13,7 +13,7 @@
  * But the micro memory is not big enough to store that many measurements.
  * So it was decided to reduce the stack size by a factor of 2. And make a copy to SD card twice a day.
  */
-#define MEASURES_LOGGER_MAX_SIZE 13
+#define MEASURES_LOGGER_MAX_SIZE 5
 
 typedef enum
 {
@@ -109,7 +109,7 @@ MEASURES_LOGGER_ERROR measures_logger_get_error();
  * @retval    MEASURES_LOGGER_RES_FAILURE if overloop on unread data.
  * @retval    MEASURES_LOGGER_RES_SUCCESS.
  */
-void measures_logger_write(void *const new_measure);
+void measures_logger_write(measure_t* new_measure);
 
 /**
  *  @brief Read last measure from m_stack at tail index.

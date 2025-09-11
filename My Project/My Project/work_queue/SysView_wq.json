@@ -43,8 +43,8 @@
             "FunctionName": "work_queue_process"
         },
         {
-            "FunctionName": "work_queue_is_empty",
-            "ParameterDescription": "Is Empty: %d"
+            "FunctionName": "work_queue_is_not_empty",
+            "ParameterDescription": "Is not Empty: %d"
         }
         ,
         {
