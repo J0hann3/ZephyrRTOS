@@ -30,6 +30,6 @@ typedef struct s_light_measure
 
 # define SLAVE_ADDR_LUM		0x10
 
-void measure_light_sensor(void *const arg);
+void measure_light_sensor();
 
 #endif

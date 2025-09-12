@@ -4,14 +4,18 @@
 #include <peripheral_clk_config.h>
 #include "calendar.h"
 #include "SEGGER_SYSVIEW.h"
+#include "temp_hum_sensor.h"
+#include "lum_sensor.h"
+#include "measures_logger.h"
+#include "work_queue.h"
 
 #ifdef DEBUG
 #include "printf.h"
 #endif
 
-struct calendar_descriptor CALENDAR_0;
+extern measure_t current_measure;
 
-static bool wake_up_calendar = false;
+struct calendar_descriptor CALENDAR_0;
 
 static struct calendar_alarm CALENDAR_0_task_wdt0, CALENDAR_0_task_wdt1, CALENDAR_0_task_wdt2, CALENDAR_0_task_wdt3, CALENDAR_0_task_wdt4, CALENDAR_0_task_wdt5;
 
@@ -80,17 +84,11 @@ static void CALENDAR_0_task_wdt_callback(struct calendar_descriptor *const descr
 {
     SEGGER_SYSVIEW_RecordEnterISR();
 	(void)descr;
-    wake_up_calendar = true;
+
+    if (current_measure.LUM_SENSOR_EN)
+        wq_enqueue(measure_light_sensor, NULL);
+    if (current_measure.TEMP_HUM_SENSOR_EN)
+        wq_enqueue(measure_temp_hum_sensor, NULL);
     SEGGER_SYSVIEW_RecordExitISR();
     return;
-}
-
-bool get_wake_up_calendar()
-{
-    return wake_up_calendar;
-}
-
-void clear_wake_up_calendar()
-{
-    wake_up_calendar = false;
 }

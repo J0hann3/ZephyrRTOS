@@ -32,6 +32,6 @@ void    hum_to_string(const uint16_t u16_hum, char s_hum[5]);
 void    temp_to_string(const uint16_t u16_temp, char *s_temp);
 void    ftoa(float fnum, char res[5]);
 
-void measure_temp_hum_sensor(void *const arg);
+void measure_temp_hum_sensor();
 
 #endif

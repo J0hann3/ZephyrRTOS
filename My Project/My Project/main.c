@@ -10,21 +10,16 @@
 #include "measures_logger.h"
 #include "timestamp.h"
 
+measure_t current_measure = {.brightness = UINT16_MAX,
+						.humidity = UINT16_MAX,
+						.temperature = UINT16_MAX,
+						.TEMP_HUM_SENSOR_EN = 1,
+						.LUM_SENSOR_EN = 1};
+
 static void BoardInitPeriph(void);
 
 int main(void)
-{
-	measure_t current_measure = {.brightness = UINT16_MAX,
-							.humidity = UINT16_MAX,
-							.temperature = UINT16_MAX,
-							.TEMP_HUM_SENSOR_EN = 1,
-							.LUM_SENSOR_EN = 1};
-	light_measure i2c_light = {.light = &current_measure.brightness,
-							.state = LIGHT_SENSOR_TURN_ON};
-	temp_measure i2c_temp = {.hum = &current_measure.humidity,
-							.temp = &current_measure.temperature,
-							.state = TEMP_SENSOR_WRITE_COMMAND};
-							
+{							
 	system_init();
 	BoardInitPeriph();
 	spi_go_to_sleep();
@@ -37,9 +32,9 @@ int main(void)
 	
 	wq_init();
 	if (current_measure.LUM_SENSOR_EN)
-		wq_enqueue(measure_light_sensor, (void *)&i2c_light);
+		wq_enqueue(measure_light_sensor, NULL);
 	if (current_measure.TEMP_HUM_SENSOR_EN)
-		wq_enqueue(measure_temp_hum_sensor, (void *)&i2c_temp);
+		wq_enqueue(measure_temp_hum_sensor, NULL);
 
 	while (1)
 	{
@@ -56,15 +51,6 @@ int main(void)
 			DEBUG_SEGGER_SYSVIEW_OnIdle();
 			_go_to_sleep();
 			DEBUG_SEGGER_SYSVIEW_OnTaskStartExec((U32)main);
-		}
-		
-		if (get_wake_up_calendar())
-		{
-			if (current_measure.LUM_SENSOR_EN)
-				wq_enqueue(measure_light_sensor, (void *)&i2c_light);
-			if (current_measure.TEMP_HUM_SENSOR_EN)
-				wq_enqueue(measure_temp_hum_sensor, (void *)&i2c_temp);
-			clear_wake_up_calendar();
 		}
 	}
 	return 0;
