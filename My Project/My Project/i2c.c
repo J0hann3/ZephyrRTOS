@@ -45,13 +45,3 @@ void I2C_0_init(void)
 	i2c_m_sync_init(&I2C_0, SERCOM1);
 	I2C_0_PORT_init();
 }
-
-// bool get_i2c_is_busy()
-// {
-//     return i2c_is_busy;
-// }
-
-// void set_i2c_is_busy(bool is_busy)
-// {
-//     i2c_is_busy = is_busy;
-// }

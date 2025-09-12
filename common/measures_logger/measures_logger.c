@@ -4,7 +4,6 @@
 #include "measures_logger.h"
 #include "temp_hum_sensor.h"
 #include "SEGGER_SYSVIEW.h"
-#include "work_queue.h"
 
 measures_stack_t m_stack;
 
