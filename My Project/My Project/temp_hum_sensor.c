@@ -42,13 +42,13 @@ static void temp_sensor_write_command(temp_measure *temp_hum)
 	i2c_m_sync_get_io_descriptor(&I2C_0, &temp_hum->i2c_device);
 	i2c_m_sync_enable(&I2C_0);
 	i2c_m_sync_set_slaveaddr(&I2C_0, SLAVE_ADDR_TEMP, I2C_M_SEVEN);
-	uint8_t check = io_write(temp_hum->i2c_device, &sensor_reg, 1);
+	int32_t check = io_write(temp_hum->i2c_device, &sensor_reg, 1);
 	if (check != 1)
 	{
 	#ifdef DEBUG
 		printf("Failed to write/read I2C device address\n");
 	#endif
-		record_sysview_measure_temp_exit(1);
+		record_sysview_measure_temp_exit(TYPE_SYSVIEW_OSERROR_ERROR);
 		temp_hum->state = TEMP_SENSOR_ERROR;
 		return;
 	}
@@ -73,7 +73,7 @@ static void temp_sensor_read_value(temp_measure *temp_hum)
 	#ifdef DEBUG
 		printf("Error invalid number of bytes read: %d\n", check);
 	#endif
-		record_sysview_measure_temp_exit(1);
+		record_sysview_measure_temp_exit(TYPE_SYSVIEW_OSERROR_ERROR);
 		temp_hum->state = TEMP_SENSOR_ERROR;
 		return ;
 	}
@@ -105,7 +105,7 @@ static void temp_sensor_read_value(temp_measure *temp_hum)
 #ifdef DEBUG
 	printf("Temperature: %d, Humidity %d\n",(*temp_hum->temp - 1000) / 10, *temp_hum->hum/ 10);
 #endif
-	record_sysview_measure_temp_exit(0);
+	record_sysview_measure_temp_exit(TYPE_SYSVIEW_OSERROR_SUCCESS);
 	temp_hum->state = TEMP_SENSOR_IDLE;
 }
 

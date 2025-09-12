@@ -10,7 +10,6 @@
 #include "measures_logger.h"
 #include "timestamp.h"
 
-static void go_to_sleep();
 static void BoardInitPeriph(void);
 
 int main(void)
@@ -52,7 +51,13 @@ int main(void)
 		if (measures_logger_count() >= measures_logger_get_size())
 			sd_card_write(NULL);
 
-		go_to_sleep();
+		if (!wq_not_empty())
+		{
+			DEBUG_SEGGER_SYSVIEW_OnIdle();
+			_go_to_sleep();
+			DEBUG_SEGGER_SYSVIEW_OnTaskStartExec((U32)main);
+		}
+		
 		if (get_wake_up_calendar())
 		{
 			if (current_measure.LUM_SENSOR_EN)
@@ -63,22 +68,6 @@ int main(void)
 		}
 	}
 	return 0;
-}
-
-static void go_to_sleep()
-{
-	if (wq_not_empty())
-		return;
-	// DEBUG_SEGGER_SYSVIEW_OnIdle();
-	_go_to_sleep();
-	// DEBUG_SEGGER_SYSVIEW_OnTaskStartExec((U32)main);
-	// while (get_tc_timestamp_status() && !get_wake_up_calendar())
-	// {
-	// 	reset_tc_timestamp_status();
-	// 	DEBUG_SEGGER_SYSVIEW_OnIdle();
-	// 	_go_to_sleep();
-	// 	DEBUG_SEGGER_SYSVIEW_OnTaskStartExec((U32)main);
-	// }
 }
 
 static void BoardInitPeriph(void)

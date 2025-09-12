@@ -64,6 +64,7 @@ static void light_sensor_write_command(light_measure *light)
 	if (!is_delay_reach(DELAY_LIGHT_SENSOR_TURN_ON, light->time_start_measure))
 		return ;
 
+	record_sysview_config_light_sensor_enter(data_config[0], data_config[1], data_config[2]);
 	i2c_m_sync_get_io_descriptor(&I2C_0, &light->i2c_device);
 	i2c_m_sync_enable(&I2C_0);
 	i2c_m_sync_set_slaveaddr(&I2C_0, SLAVE_ADDR_LUM, I2C_M_SEVEN);
@@ -75,10 +76,12 @@ static void light_sensor_write_command(light_measure *light)
 	#ifdef DEBUG
 		printf("Init i2c error\n");
 	#endif
+		record_sysview_config_light_sensor_exit(TYPE_SYSVIEW_OSERROR_ERROR);
 		return;
 	}
 	light->time_start_measure = get_timestamp();
 	light->state = LIGHT_SENSOR_READ_VALUE;
+	record_sysview_config_light_sensor_exit(TYPE_SYSVIEW_OSERROR_SUCCESS);
 }
 
 static void read_lum_sensor(light_measure *light)
@@ -97,7 +100,7 @@ static void read_lum_sensor(light_measure *light)
 		printf("Failed to write/read I2C device address \n");
 	#endif
 		light->state = LIGHT_SENSOR_ERROR;
-		record_sysview_measure_light_exit(1);
+		record_sysview_measure_light_exit(TYPE_SYSVIEW_OSERROR_ERROR);
 		return ;
 	}
 	*light->light = ((uint16_t)data_read[1] << 8) + data_read[0];
@@ -106,7 +109,7 @@ static void read_lum_sensor(light_measure *light)
 #ifdef DEBUG
 	printf("Light sensor: %d\n", *light->light);
 #endif
-	record_sysview_measure_light_exit(0);
+	record_sysview_measure_light_exit(TYPE_SYSVIEW_OSERROR_SUCCESS);
 	light->state = LIGHT_SENSOR_TURN_OFF;
 	return ;
 }
