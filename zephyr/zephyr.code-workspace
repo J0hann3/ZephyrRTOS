@@ -8,6 +8,12 @@
 		}
 	],
 	"settings": {
+		"editor.bracketPairColorization.enabled": true,
+		"editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+		"editor.guides.bracketPairs": "active",
+		"editor.guides.bracketPairsHorizontal": "active",
+		"editor.guides.highlightActiveBracketPair": true,
+
 		// Hush CMake
 		"cmake.configureOnOpen": false,
 
@@ -54,7 +60,11 @@
 			"lum_sensor.h": "c",
 			"rtc.h": "c",
 			"lorawan.h": "c",
-			"chrono": "c"
+			"chrono": "c",
+			"flash_map.h": "c",
+			"*.ch": "c",
+			"mcuboot.h": "c",
+			"settings.h": "c"
 		},
 		"cortex-debug.variableUseNaturalFormat": true
 	},
@@ -183,7 +193,9 @@
 				"name": "Launch Openocd Samd21",
 				"deviceName": "ATSAMD21G18A",
 				"cwd": "${workspaceFolder:zephyr}",
-				"executable": "build\\zephyr\\zephyr.elf",
+				"executable": "build\\fuota\\zephyr\\zephyr.elf",
+				"loadFiles": ["build\\fuota\\zephyr\\zephyr.elf", "build\\mcuboot\\zephyr\\zephyr.elf"],
+				"symbolFiles": ["build\\fuota\\zephyr\\zephyr.elf", "build\\mcuboot\\zephyr\\zephyr.elf"],
 				"request": "launch",
 				"type": "cortex-debug",
 				"runToEntryPoint": "main",
@@ -197,13 +209,17 @@
 				"name": "Attach  Openocd Samd21",
 				"deviceName": "ATSAMD21G18A",
 				"cwd": "${workspaceFolder:zephyr}",
-				"executable": "build\\zephyr\\zephyr.elf",
+				"executable": "build\\fuota\\zephyr\\zephyr.elf",
+				"loadFiles": ["build\\fuota\\zephyr\\zephyr.elf", "build\\mcuboot\\zephyr\\zephyr.elf"],
+				"symbolFiles": ["build\\fuota\\zephyr\\zephyr.elf", "build\\mcuboot\\zephyr\\zephyr.elf"],
 				"request": "attach",
 				"type": "cortex-debug",
 				"runToEntryPoint": "main",
-				"servertype": "external",
+				"servertype": "openocd",
+				"configFiles": ["${workspaceFolder:zephyr}/boards/atmel/NxG_Court/support/openocd.cfg"],
+				// "servertype": "external",
 				"gdbPath": "${userHome}\\zephyr-sdk-0.17.0\\arm-zephyr-eabi\\bin\\arm-zephyr-eabi-gdb",
-				"gdbTarget": ":3333",
+				// "gdbTarget": ":3333",
 				"svdPath": "Microchip::SAMD21_DFP@3.6.144",
 			},
 			{
