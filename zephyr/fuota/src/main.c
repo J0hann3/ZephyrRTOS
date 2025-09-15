@@ -13,6 +13,8 @@
 #include <zephyr/lorawan/lorawan.h>
 #include <zephyr/sys/reboot.h>
 #include <zephyr/settings/settings.h>
+#include <stdio.h>
+#include <zephyr/dfu/mcuboot.h>
 
 LOG_MODULE_REGISTER(lorawan_fuota, CONFIG_LORAWAN_SERVICES_LOG_LEVEL);
 
@@ -72,14 +74,9 @@ static void fuota_finished(void)
 	 * no important tasks are pending
 	 */
 }
-// #include <stdio.h>
-// #include <zephyr/dfu/mcuboot.h>
 
 int main(void)
 {
-	// printf("return : %d, swap_type: %d\n", boot_write_img_confirmed(), mcuboot_swap_type());
-	// printf("Is image confirmed: %d\n", boot_is_img_confirmed());
-	// printf("coucou\n");
 	const struct device *lora_dev;
 	struct lorawan_join_config join_cfg;
 	uint8_t dev_eui[] = LORAWAN_DEV_EUI;
@@ -179,4 +176,15 @@ int main(void)
 	}
 
 	return 0;
+}
+
+/***
+ * Should be call in the new image that is updated to keep this image permanent and avoid
+ * switching back to the old image.
+ */
+void confirm_new_image()
+{
+	printf("return : %d, swap_type: %d\n", boot_write_img_confirmed(), mcuboot_swap_type());
+	printf("Is image confirmed: %d\n", boot_is_img_confirmed());
+	printf("coucou\n");
 }
