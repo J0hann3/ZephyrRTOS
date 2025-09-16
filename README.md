@@ -46,6 +46,3 @@ Pour tester le FUOTA, j’ai utilisé RedWoodComm.
 - Sur RedWoodComm, cela ne sert à rien de changer la configuration tant qu’une session de FUOTA est en cours, en prévision d’une prochaine session. En effet, au moment d’arrêter la session en cours (ou quand elle s’arrête), les configurations modifiées sont réinitialisées.
 - Avec Zéphyr, dès que les fragments sont reçus, ils sont directement écrits en mémoire dans la partition dédié, sauf pour les fragments de redondance, qui eux sont stockés en RAM jusqu'à ce que le binaire puisse être reconstruit. S'il n'y a pas assez de mémoire en RAM allouer pour ça la session de fuota ça s'arrêter sans dire d'erreur, mais le binaire sera impossible à reconstruire, car il manquera des fragments.
 - Avec Zephyr le fichier à envoyer est le fichier `zephyr.signed.bin` car il est hashé et encrypté avec la bonne clé (celle utilisé dans le bootloader), sinon le nouveau binaire ne sera pas considérer comme valide.
-
-### System View
-Sur les cartes renesas, connecter la sonde de debug a un produit qui est entrain de dormir va le reveiller 
