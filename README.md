@@ -7,7 +7,7 @@ Toute la documentation sur Zéphyr se trouve dans le fichier [Zephyr_documentati
 Pour System View, la documentation est directement dans le projet `-hardware-_S137_asf` dans le dossier `S137/peripherals_SAMD21/SystemView` avec le code source directement.
 
 ### Poc BareMetal
-Dans le dossier `My Project` se trouve le POC en BareMetal utilise le capteur de température et luminosité ainsi que la carte SD. Ce POC fonctionne sur nxg_court et implémente aussi la basse consommation.
+Dans le dossier `My Project` se trouve le POC en BareMetal qui utilise le capteur de température et luminosité ainsi que la carte SD. Ce POC fonctionne sur nxg_court et implémente aussi la basse consommation.
 
 ### Work Queue
 Sur la branche `work_queue` le même POC est présent, mais cette fois la work queue est utilisé dans la boucle main pour pouvoir faire plusieurs choses en même temps et éviter les delays. La work queue est instrumenté avec System View, mais si la work queue tourne trop rapidement la plupart des messages vont être perdu, car RTT ne sera pas assez rapide pour les lire. Sur System View ça se verra avec un bandeau rouge signalant un overflow. System View par défaut skip (mets à la poubelle) les messages quand le buffer RTT est plein. Ce comportement est écrit en dur dans le code source de SystemView, et ne peut pas être changer facilement avec un define. Pour éviter les overflows du buffer RTT, il faut soit réduire le nombre d'événements à suivre ou alors ralentir la work queue pour qu'elle soit plus lente.
@@ -26,8 +26,8 @@ Dans le dossier Zéphyr se trouve les différentes applications développées po
 - `custom_board` qui était là pour tester les buttons, les leds, le pwm ainsi que les interruptions sur Nxg_court et ra2l1 (Renesas)
 - `i2c` utilise le capteur de température et de luminosité sur le bus i2c de la carte d'évaluation samd21
 - `renesas_sd_card` est l'application utilisée pour montrer le bug d'écriture de la carte sd sur la carte renesas ra2l1. Il y a une issue github https://github.com/zephyrproject-rtos/zephyr/issues/90935 sur Zéphyr qui redirige vers ce repo git.
-- `zephyr_nxg_court` est l'équivalent du POC en bareMetal avec le capteur de température, de luminosité et la carte SD. En plus, il y a des fonctions pour tester le lora et la rtc. Cette application marche sur nxg_court. La rtc a une erreur à l'initialisation, donc elle ne marche pas. J'ai ouvert un ticket sur microchip, mais pas eu de réponse depuis. La base consommation n'est pas encore développée pour cette carte.
-- `led_thread` permet de jouer avec la notion de thread sur Zéphyr ainsi que les priorités
+- `zephyr_nxg_court` est l'équivalent du POC en bareMetal avec le capteur de température, de luminosité et la carte SD. En plus, il y a des fonctions pour tester le lora et la rtc. Cette application marche sur nxg_court. La rtc a une erreur à l'initialisation, donc elle ne marche pas. J'ai ouvert un ticket sur microchip, mais pas eu de réponse depuis. La base consommation n'est pas encore développée pour cette carte, et ne peut pas etre fait manuellement car la rtc ne fonctionne pas.
+- `led_thread` permet de jouer avec la notion de thread sur Zéphyr ainsi que les priorités.
 
 #### Script
 Les script `env.sh` et `env.cmd` permettent de définir la variable contenant le chemin vers le repo git zéphyr ainsi que de lancer l'environnement virtuel python, qui permet d'utiliser la commande `west` (commande pour compiler et flasher de Zéphyr).
