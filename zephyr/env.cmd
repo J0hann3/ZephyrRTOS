@@ -1,7 +1,8 @@
 @echo off
+set PATH_ZEPHYR=C:\Users\JohanneVIGNY\zephyrproject1
 
 @REM set zephyr directory path in the env
-set ZEPHYR_BASE=C:\Users\JohanneVIGNY\zephyrproject1\zephyr
+set ZEPHYR_BASE=%PATH_ZEPHYR%\zephyr
 
 @REM activate python virtual environment
-..\..\zephyrproject1\.venv\Scripts\activate.bat
+%PATH_ZEPHYR%\.venv\Scripts\activate.bat
